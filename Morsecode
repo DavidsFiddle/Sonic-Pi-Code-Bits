@@ -1,0 +1,44 @@
+#Play Morsecode
+define :play_morse do |letter, note|
+  l = 0.6
+  s = 0.2
+  times = case letter
+  when 'a' then [s,l]
+  when 'b' then [l,s,s,s]
+  when 'c' then [l,s,l,s]
+  when 'd' then [l,s,s]
+  when 'e' then [s]
+  when 'f' then [s,s,l,s]
+  when 'g' then [e,l,s]
+  when 'h' then [s,s,s,s]
+  when 'i' then [s,s]
+  when 'j' then [s,e,l,l]
+  when 'k' then [e,s,l]
+  when 'l' then [s,l,s,s]
+  when 'm' then [l,l]
+  when 'n' then [l,s]
+  when 'o' then [l,l,l]
+  when 'p' then [s,l,l,s]
+  when 'q' then [l,l,s,l]
+  when 'r' then [s,l,s]
+  when 's' then [s,s,s]
+  when 't' then [l]
+  when 'u' then [s,s,l]
+  when 'v' then [s,s,s,l]
+  when 'w' then [s,l,l]
+  when 'x' then [l,s,s,l]
+  when 'y' then [l,s,l,l]
+  when 'z' then [l,l,s,s]
+  end
+  play_pattern_timed (knit note, times.length),times
+  sleep 0.2
+end
+
+define :play_morse_text do |text|
+  use_synth :beep
+  use_synth_defaults release: 0.2
+  for x in (range 0,text.length) do
+      play_morse text[x],:a5
+      sleep 0.6
+    end
+  end
