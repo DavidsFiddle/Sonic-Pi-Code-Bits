@@ -1,0 +1,11 @@
+#Cluster
+#root is the lowest note
+#range is the number of steps that are played
+#spread is the distance between steps
+define :cluster do |root, range, spread|
+  i = 0
+  range.times do
+    play (root + i)
+    i = i+spread
+  end
+end
