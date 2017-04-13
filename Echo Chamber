@@ -1,0 +1,37 @@
+#Echo Chamber
+#Coded by Davids Fiddle
+
+use_bpm 60
+
+with_fx :reverb do
+  with_fx :compressor do
+    with_fx :echo, delay: 0.5, decay: 4 do
+      live_loop :echoes do
+        use_synth :tb303
+        play chord([:a2,:d2,:a3,:d3].choose,
+        :minor).choose,
+          cutoff: range(70,110).choose,
+          amp: 0
+        sleep [0.25,0.5,0.5,0.75,1,1].choose
+      end
+    end
+  end
+  
+  live_loop :bass do
+    use_synth :hollow
+    play [:a2, :a1].choose,
+      sustain: [2.5,3,3.5].choose,
+      release: [0.25,0.5,0.75,1,1.25].choose,
+      amp: 0
+    sleep 4
+  end
+  
+  live_loop :arp do
+    use_synth :dpulse
+    play chord([:a3,:d3,:e3].choose,
+    :minor).choose,
+      amp: 0, release: 0.1,
+      sustain: 0.1, attack: 0.025
+    sleep 0.25
+  end
+end
