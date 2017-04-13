@@ -1,0 +1,178 @@
+#Halo CE - A Walk in the Woods  
+#Coded by Davids Fiddle
+
+use_bpm 72
+
+#Mixer:
+amp_melody1 = 1.5
+amp_melody2 = 1.5
+amp_bass = 1.5
+amp_snare = 0.7
+amp_hihat = 0.8
+amp_kick = 1.1
+amp_pedal = 1
+
+s = 0.25
+e = 0.5
+q = 1
+dq = 1.5
+h = 2
+f = 4
+
+define :bass1 do
+  play_pattern_timed [:d2,:d2],[s,s], sustain: 0, amp: amp_bass/2, release: q, attack_level: 1.2, coef: 0.7
+  sleep q
+  play_pattern_timed [:d2,:d2,:c3,:d2,:d2],
+    [h,s,s,s,s], sustain: 0, amp: amp_bass/2, release: q, attack_level: 1.2, coef: 0.7
+  sleep q
+  play_pattern_timed [:d2,:d2,:c3,:d3],
+    [dq+s,s,s,s], sustain: 0, amp: amp_bass/2, release: q, attack_level: 1.2, coef: 0.7
+end
+
+define :bass2 do
+  play_pattern_timed [:d2,:c3,:d2,:d3,:d2,:d2,:d2,:d2,:c3,:d2,:d3,:d2,:c3,:d2],
+    [e,s,s,s,s,s,e,s,s,s,s,s,s,s], sustain: 0, amp: amp_bass/2, release: q, attack_level: 1.2, coef: 0.7
+end
+
+#Bass
+in_thread do
+  with_fx :reverb do
+    use_synth :beep
+    2.times do
+      bass1
+    end
+    4.times do
+      bass2
+    end
+    play :d2, sustain: h, release: f+h
+    sleep 2*f
+    2.times do
+      bass1
+    end
+    4.times do
+      bass2
+    end
+    sleep 2*f
+    2.times do
+      bass1
+    end
+    4.times do
+      bass2
+    end
+  end
+end
+in_thread do
+  use_synth :fm
+  2.times do
+    bass1
+  end
+  4.times do
+    bass2
+  end
+  play :d2, sustain: h, release: f+h
+  sleep 2*f
+  2.times do
+    bass1
+  end
+  4.times do
+    bass2
+  end
+  sleep 2*f
+  2.times do
+    bass1
+  end
+  4.times do
+    bass2
+  end
+end
+
+#Pedal
+in_thread do
+  sleep 8*f
+  20.times do
+    4.times do
+      sample :drum_cymbal_pedal, amp: amp_pedal
+      sleep q
+    end
+  end
+end
+
+#Kick
+in_thread do
+  sleep 8*f
+  20.times do
+    sample :drum_bass_hard, amp: amp_kick
+    sleep 3*e
+    sample :drum_bass_hard, amp: amp_kick
+    sleep 5*e
+  end
+end
+
+#Snare
+in_thread do
+  sleep 10*f
+  18.times do
+    sleep q
+    sample :drum_snare_hard, amp: amp_snare
+    sleep h
+    sample :drum_snare_hard, amp: amp_snare
+    sleep q
+  end
+end
+
+#Hihat
+in_thread do
+  sleep 10*f
+  #with_fx :ring_mod do
+  18.times do
+    sleep 3*e
+    sample :drum_cymbal_soft, amp: amp_hihat
+    sleep s
+    sample :drum_cymbal_soft, amp: amp_hihat
+    sleep 3*e+s
+    sample :drum_cymbal_soft, amp: amp_hihat
+    sleep s
+    sample :drum_cymbal_soft, amp: amp_hihat
+    sleep s
+  end
+  #end
+end
+
+#Melody1
+in_thread do
+  use_synth :hollow
+  2.times do
+    play_pattern_timed [:fs3,:g3,:fs3,:f3,:e3,:d3,:d3,:d3,:d3,:d3],
+      [e,e,e,e+h,e,q,h+e,dq,h+e,f], amp: amp_melody1, pan: 0.3
+  end
+  sleep 2*f
+  2.times do
+    play_pattern_timed [:fs3,:g3,:fs3,:f3,:e3,:d3,:d3,:d3,:d3,:d3],
+      [e,e,e,e+h,e,q,h+e,dq,h+e,f], amp: amp_melody1, pan: 0.3
+  end
+  sleep 2*f
+  2.times do
+    play_pattern_timed [:fs3,:g3,:fs3,:f3,:e3,:d3,:d3,:d3,:d3,:d3],
+      [e,e,e,e+h,e,q,h+e,dq,h+e,f], amp: amp_melody1, pan: 0.3
+  end
+  
+end
+
+#Melody2
+in_thread do
+  use_synth :hollow
+  2.times do
+    play_pattern_timed [:d3,:d3,:d3,:d3,:c3,:b2,:b2,:a2,:as2,:b2],
+      [e,e,e,e+h,e,q,h+e,dq,h+e,f], amp: amp_melody2, pan: -0.3
+  end
+  sleep 2*f
+  2.times do
+    play_pattern_timed [:d3,:d3,:d3,:d3,:c3,:b2,:b2,:a2,:as2,:b2],
+      [e,e,e,e+h,e,q,h+e,dq,h+e,f], amp: amp_melody2, pan: -0.3
+  end
+  sleep 2*f
+  2.times do
+    play_pattern_timed [:d3,:d3,:d3,:d3,:c3,:b2,:b2,:a2,:as2,:b2],
+      [e,e,e,e+h,e,q,h+e,dq,h+e,f], amp: amp_melody2, pan: -0.3
+  end
+end
