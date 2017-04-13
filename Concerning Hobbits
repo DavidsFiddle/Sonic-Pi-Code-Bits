@@ -1,0 +1,96 @@
+#Concerning Hobbits - Lord of the Rings
+#Coded by Davids Fiddle
+
+use_bpm 84
+
+w = 4
+dh = 3
+h = 2
+dq = 1.5
+q = 1
+de = 0.75
+e = 0.5
+s = 0.25
+
+#Bass
+in_thread do
+  use_synth :chipbass
+  use_synth_defaults pan: 0.1
+  play_pattern_timed [:d2,:r,:a2,:r,:d3,:r,:a2,:r,:d2,:r,:a2,:r,:d3,:r],
+    [e,e,e,e,e,e,e,e,e,e,e,e,e,dq]
+  2.times do
+    play_pattern_timed [:d3,:d3,:g2,:d3,:a2],[w,w,w,h,h]
+  end
+  play_pattern_timed [:d2,:r,:a2,:r,:d3,:r,:a2,:r,:d2,:r,:a2,:r,:d3,:r,:a2,:r],
+    [e,e,e,e,e,e,e,e,e,e,e,e,e,e,e,e]
+  play_pattern_timed [:d3,:a2,:b2,:d2,:a2,:d2,:g2,:a2,:b2,:b2,:b2,:g2,:d3,:a2,:d3],[w,w,w,h,h,w,h,h,w,w,w,w,h,h,w]
+end
+
+#Cbl
+define :arp do |root, type|
+  4.times do
+    play (chord root, type).tick
+    sleep e
+  end
+end
+
+in_thread do
+  with_fx :reverb do
+    use_synth :pluck
+    use_synth_defaults amp: 1.4
+    sleep 12*w
+    arp :d3, :major
+    arp :d3, :major
+    arp :a3, :major
+    arp :a3, :major
+    arp :b3, :minor
+    arp :b3, :minor
+    arp :d3, :major
+    arp :a3, :major
+    arp :d3, :major
+    arp :d3, :major
+    arp :g3, :major
+    arp :a3, :major
+    arp :b3, :minor
+    arp :b3, :minor
+    arp :b3, :minor
+    arp :b3, :minor
+    arp :b3, :minor
+    arp :b3, :minor
+    arp :g3, :major
+    arp :g3, :major
+    arp :d3, :major
+    arp :a3, :major
+  end
+end
+
+#Flute
+in_thread do
+  use_synth :chiplead
+  use_synth_defaults pan: 0.2, amp: 0.8
+  play_pattern_timed [:r,:r,:r,:d4,:e4,:fs4,:a4,:fs4,:e4,:d4,:e4,:d4,:fs4,:a4,:b4,:d5,:cs5,:a4,:fs4,:g4,:fs4,:e4,:d4,:e4,:fs4,:a4,:fs4,:e4,:d4,:e4,:d4,:fs4,:a4,:b4,:a4,:fs4,:a4,:fs4,:e4,:d4,:r,:r],
+    [w,h,dq,s,s,q,q,e,e,de,s,dh,e,e,q,q,q,q,dq,s,s,dq,s,s,q,q,e,e,de,s,dh,e,e,dq,e,q,q,h,h,q,dh]
+  sleep 6*w
+  play_pattern_timed [:b3,:r,:b3,:cs4,:d4,:d4,:e4,:fs4],
+    [dh,q,s,s,dh,s,s,dh], amp: 0.7
+end
+
+#Lead
+in_thread do
+  use_synth :blade
+  use_synth_defaults pan: -0.2, amp: 0.9
+  sleep 2*w
+  2.times do
+    play_pattern_timed [:d3,:d3,:g2,:d3,:a2],[w,w,w,h,h]
+  end
+  sleep 2*w
+  use_synth_defaults amp: 1.5
+  play_pattern_timed [:d4,:e4,:fs4,:r,:fs4,:r,:fs4,:a4,:e4,:d4,:e4,:r,:a3,:b3,:cs4,:r,:cs4,:r,:d4,:r,:b3,:fs3,:r,:a3,:e3,:r],
+    [s,s,e,e,e,dq,e,e,e,e,e,h,s,s,e,e,e,e,e,e,e,e,q,e,e,dq]
+  play_pattern_timed [:d4,:e4,:fs4,:r,:fs4,:r,:a4,:fs4,:e4,:r,:d4,:e4,:cs4,:r,:d4,:cs4],
+    [s,s,e,e,e,dq,e,e,e,e,e,e,e,e,s,s]
+  play_pattern_timed [:b3,:r,:b3,:cs4,:d4,:d4,:e4,:fs4],
+    [dh,q,s,s,dh,s,s,dh]
+  play_pattern_timed [:r,:b4,:cs5,:d5,:cs5,:a4,:fs4,:e4,:d4],
+    [e,s,s,h,q,q,h,h,w]
+end
