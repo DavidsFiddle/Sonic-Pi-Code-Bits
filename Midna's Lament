@@ -1,0 +1,180 @@
+#Midna's Lament
+#Legend Of Zelda: Twilight Princess
+#Coded by Davids Fiddle
+
+dh = 3
+h = 2
+dq = 1.5
+q = 1
+e = 0.5
+s = 0.25
+
+use_bpm 120
+
+#Arpeggio
+define :intro do
+  3.times do
+    play_pattern_timed [:d2,:e2,:f2,:a2,:c3,:e3],
+      [e,e,e,e,e,e,e,e]
+  end
+  play_pattern_timed [:g3,:e3,:c3,:a2,:f2,:e2],
+    [e,e,e,e,e,e,e,e]
+end
+
+define :b5 do
+  4.times do
+    play_pattern_timed [:d2,:e2,:f2,:a2,:c3,:e3],
+      [e,e,e,e,e,e,e,e]
+  end
+end
+
+define :b9 do
+  4.times do
+    play_pattern_timed [:d2,:e2,:f2,:a2,:b2,:e3],
+      [e,e,e,e,e,e,e,e]
+  end
+end
+
+define :main do
+  2.times do
+    b5
+    b9
+  end
+end
+
+define :b21 do
+  2.times do
+    play_pattern_timed [:d2,:e2,:f2,:a2,:c3,:e3],
+      [e,e,e,e,e,e]
+  end
+end
+
+define :b23 do
+  2.times do
+    play_pattern_timed [:eb2,:f2,:g2,:bb2,:d3,:f3],
+      [e,e,e,e,e,e]
+  end
+end
+
+define :b25 do
+  2.times do
+    play_pattern_timed [:ab1,:c2,:eb2,:g2,:bb2,:d3],
+      [e,e,e,e,e,e]
+  end
+end
+
+define :b27 do
+  2.times do
+    play_pattern_timed [:a1,:db2,:e2,:a2,:db3,:e3],
+      [e,e,e,e,e,e]
+  end
+end
+
+define :b45 do
+  2.times do
+    play_pattern_timed [:a1,:e2,:f2,:a2,:c3,:e3],
+      [e,e,e,e,e,e]
+  end
+end
+
+define :b47 do
+  2.times do
+    play_pattern_timed [:g1,:d2,:e2,:g2,:b2,:c3],
+      [e,e,e,e,e,e]
+  end
+end
+
+define :b49 do
+  2.times do
+    play_pattern_timed [:f1,:c2,:d2,:f2,:a2,:c3],
+      [e,e,e,e,e,e]
+  end
+end
+
+define :b51 do
+  2.times do
+    play_pattern_timed [:e1,:b1,:c2,:e2,:g2,:b2],
+      [e,e,e,e,e,e]
+  end
+end
+
+define :b53 do
+  2.times do
+    play_pattern_timed [:g1,:c2,:d2,:f2,:a2,:c3],
+      [e,e,e,e,e,e]
+  end
+end
+
+define :b55 do
+  2.times do
+    play_pattern_timed [:gs1,:c2,:d2,:fs2,:a2,:c3],
+      [e,e,e,e,e,e]
+  end
+end
+
+define :b57 do
+  2.times do
+    play_pattern_timed [:a1,:d2,:e2,:g2,:b2,:d3],
+      [e,e,e,e,e,e]
+  end
+end
+
+in_thread do
+  with_fx :reverb, room: 0.7, damp: 0 do
+    use_synth :piano
+    use_synth_defaults sustain: s,
+      amp: 0.8, pan: -0.2
+    intro
+    main
+    b21
+    b23
+    b25
+    b27
+    main
+    b45
+    b47
+    b49
+    b51
+    b53
+    b55
+    b57
+    intro
+    play :d2
+  end
+end
+
+
+#Lead
+define :rMain do
+  play_pattern_timed [:a3,:f4,:e4,:c4,:b3,:a3,:g3,:b3],
+    [h,q,h,q,h,e,e,dh]
+  play_pattern_timed [:r,:d4,:a4,:e4,:d4,:a4,:e4,:r,:r],
+    [dh,e,e,q,e,e,q,h,dh]
+  play_pattern_timed [:a3,:f4,:e4,:c4,:b3,:a3,:g3,:b3],
+    [h,q,h,q,h,e,e,dh]
+  play_pattern_timed [:r,:r,:f4,:c5,:g4,:f4,:e4,:r,:r],
+    [dh,q,e,e,e,e,q,h,dh]
+end
+
+in_thread do
+  with_fx :reverb, room: 0.7 do
+    use_synth :piano
+    use_synth_defaults amp: 1.2
+    sleep 4*3
+    rMain
+    play_pattern_timed [:a4,:eb4,:bb4,:a4,:f4],
+      [dh+dh,dq,dq,dq,dq]
+    play_pattern_timed [:g4,:f4,:g4,:e4],
+      [dh+h,e,e,dh+dh]
+    rMain
+    use_synth :blade
+    play_pattern_timed [:c4,:e4,:d4,:g3,:f3,:e4,:d4,:e3,:r],
+      [h,q,dq,dq,dh+h,q,dq,dq,dh]
+    use_synth :piano
+    play_pattern_timed [:r,:g3,:d4,:a3,:g3,:d4,:a3,:r],
+      [q,e,e,q,e,e,q,q]
+    use_synth :blade
+    play_pattern_timed [:r,:g3,:d4,:a3,:r,:r,:a3,:e4,:b3,:a3,:e4,:b3,:r,:r,:c4,:g4,:d4,:c4,:b3],
+      [q,e,e,q,dh,q,e,e,q,e,e,q,q,q,e,e,e,e,q]
+  end
+end
