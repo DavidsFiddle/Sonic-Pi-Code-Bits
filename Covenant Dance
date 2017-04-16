@@ -1,0 +1,159 @@
+#Halo CE
+#Covenant Dance
+#Coded by Davids Fiddle
+
+use_bpm 180
+#1st Voice
+in_thread do
+  use_synth :blade
+  with_fx :reverb do
+    sleep 12
+    play :e3, release: 4, sustain: 2
+    play :g3, release: 4, sustain: 2
+    sleep 6
+    play :e3, release: 4, sustain: 2
+    play :a3, release: 4, sustain: 2
+    sleep 6
+    play :fs3, release: 4, sustain: 2
+    play :b3, release: 4, sustain: 2
+    sleep 6
+    play :fs3, release: 4, sustain: 2
+    play :cs4, release: 4, sustain: 2
+    sleep 6
+    play :e3, release: 4, sustain: 2
+    play :b3, release: 4, sustain: 2
+    sleep 6
+    play :e3, release: 4, sustain: 2
+    play :cs4, release: 4, sustain: 2
+    sleep 6
+    play :fs3, release: 4, sustain: 2
+    play :d4, release: 4, sustain: 2
+    sleep 6
+    play :e3, release: 4, sustain: 25
+    play :cs4, release: 4, sustain: 25
+    play :e4, release: 4, sustain: 25
+    sleep 30
+    
+    sleep 6*8
+    with_fx :reverb, phase: 1 do
+      play :b3, release: 4, sustain: 8
+      sleep 12
+      play :c4, release: 4, sustain: 2
+      play :g4, release: 4, sustain: 2
+      sleep 6
+      play :b3, release: 2, sustain: 1
+      play :fs4, release: 2, sustain: 1
+      sleep 3
+      play :g3, release: 2, sustain: 1
+      play :d4, release: 2, sustain: 1
+      sleep 3
+      play :b3, release: 4, sustain: 8
+      sleep 12
+      play :c4, release: 4, sustain: 2
+      play :g4, release: 4, sustain: 2
+      sleep 6
+      play :b3, release: 2, sustain: 1
+      play :fs4, release: 2, sustain: 1
+      sleep 3
+      play :g3, release: 2, sustain: 1
+      play :d4, release: 2, sustain: 1
+      sleep 3
+      play :b3, release: 4, sustain: 8
+      sleep 12
+      play :c4, release: 4, sustain: 2
+      play :g4, release: 4, sustain: 2
+      sleep 6
+      play :b3, release: 4, sustain: 2
+      play :fs4, release: 4, sustain: 2
+      sleep 6
+    end
+    play :e3, release: 4, sustain: 2
+    play :g3, release: 4, sustain: 2
+    sleep 6
+    play :e3, release: 4, sustain: 2
+    play :a3, release: 4, sustain: 2
+    sleep 6
+    play :fs3, release: 4, sustain: 2
+    play :b3, release: 4, sustain: 2
+    sleep 6
+    play :fs3, release: 4, sustain: 2
+    play :cs4, release: 4, sustain: 2
+    sleep 6
+    play :e3, release: 4, sustain: 2
+    play :b3, release: 4, sustain: 2
+    sleep 6
+    play :e3, release: 4, sustain: 2
+    play :cs4, release: 4, sustain: 2
+    sleep 6
+    play :fs3, release: 4, sustain: 2
+    play :d4, release: 4, sustain: 2
+    sleep 6
+    play :e3, release: 4, sustain: 30
+    play :cs4, release: 4, sustain: 30
+    play :e4, release: 4, sustain: 30
+    sleep 30
+  end
+end
+
+#2nd Voice
+in_thread do
+  with_fx :reverb do
+    use_synth :fm
+    sleep 12*7
+    8.times do
+      3.times do
+        play_pattern_timed [:e2,:e3,:e2,:b2,:e3],[1,0.5,0.5,0.5,0.5]
+      end
+      play_pattern_timed [:g3,:fs3,:d3],[1,1,1]
+      3.times do
+        play_pattern_timed [:e2,:e3,:e2,:b2,:e3],[1,0.5,0.5,0.5,0.5]
+      end
+      play_pattern_timed [:a3,:g3,:d3],[1,1,1]
+    end
+  end
+end
+
+#Beat
+in_thread do
+  7.times do
+    4.times do
+      sleep 1.5
+      sample :bd_haus, amp: 1.1
+      sleep 1.5
+    end
+  end
+end
+in_thread do
+  7.times do
+    2.times do
+      sample :bd_sone, amp: 1.5
+      sleep 2.5
+      sample :bd_sone, amp: 1.5
+      sleep 3.5
+    end
+  end
+  sleep 6*8
+  6.times do
+    2.times do
+      sample :drum_bass_hard#, amp: 1.5
+      sleep 3
+      sample :drum_bass_hard#, amp: 1.5
+      sleep 3
+    end
+  end
+end
+in_thread do
+  7.times do
+    24.times do
+      sample :bd_zum, amp: 0.2
+      sleep 0.5
+    end
+  end
+  sleep 6*12
+  4.times do
+    24.times do
+      sample :bd_zum, amp: 0.2
+      sleep 0.5
+    end
+  end
+end
