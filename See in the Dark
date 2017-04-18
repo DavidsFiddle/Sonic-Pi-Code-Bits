@@ -1,0 +1,21 @@
+#See in the Dark
+use_random_seed 42
+use_bpm 90
+
+live_loop :cluster1 do
+  synth :dark_ambience, note: [:g2,:gs2,:a2,:as2,:b2].choose,
+    sustain: [6,7,8,9].choose,
+    release: [4,6,8].choose,
+    attack: 2, amp: 0
+  sleep (range 8,14).choose
+end
+with_fx :gverb do
+  live_loop :cluster2 do
+    synth :dark_ambience, note: [:fs3,:g3,:gs3,:a3,:as3,:b3,:c3].choose,
+      sustain: [6,7,8].choose,
+      release: [4,6].choose,
+      attack: 2, amp: 0,
+      cutoff: 80
+    sleep (range 5,10).choose
+  end
+end
