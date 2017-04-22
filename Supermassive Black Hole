@@ -1,0 +1,304 @@
+#Supermassive Black Hole - Muse
+#Coded by Davids Fiddle
+
+
+use_bpm 120
+
+w = 4
+dh = 3
+h = 2
+dq = 1.5
+q = 1
+e = 0.5
+s = 0.25
+
+#Shaker
+uncomment do
+  define :sh do
+    play_pattern_timed [:a3,:a3,:a3,:a3,:a3,:a3,:a3,:a3,:a3],
+      [e,s,s,e,e,e,e,e]
+  end
+  
+  define :sh_intro do
+    8.times do
+      sh
+    end
+  end
+  
+  define :sh_riff do
+    8.times do
+      sh
+    end
+  end
+  
+  define :sh_verse do
+    8.times do
+      sh
+    end
+  end
+  
+  define :sh_chorus do
+    15.times do
+      sh
+    end
+    sleep 4
+  end
+  
+  in_thread do
+    use_synth :noise
+    use_synth_defaults sustain: 0.025, release: 0.1, attack: 0.025,
+      cutoff: 105, amp: 0.8
+    sh_intro
+    sh_riff
+    sh_verse
+    sh_chorus
+    sh_verse
+    sh_chorus
+    sh_intro
+    sh_verse
+    sh_chorus
+    sh_intro
+  end
+end
+
+#Drums
+define :dr_4bar do
+  3.times do
+    sample :drum_bass_hard
+    sleep q
+    sample :drum_snare_hard
+    sleep e
+    sample :drum_bass_hard
+    sleep dq
+    sample :drum_snare_hard
+    sleep q
+  end
+  sleep e
+  sample :drum_bass_hard
+  sleep e
+  sample :drum_snare_hard
+  sleep e
+  sample :drum_bass_hard
+  sleep dq
+  sample :drum_snare_hard
+  sleep q
+end
+
+in_thread do
+  26.times do
+    dr_4bar
+  end
+end
+
+#Bass
+define :bs_intro do
+  4.times do
+    play :e2, sustain: q, release: e
+    sleep 2*w
+  end
+end
+
+define :bs_riff do
+  play_pattern_timed [:e2,:e2,:g2,:e2,:e2,:a2,:a2,:a2],
+    [e,e,e,e,e,e,e,e]
+  play_pattern_timed [:e2,:e2,:g2,:e2,:e2,:a2,:a2,:g2],
+    [e,e,e,e,e,e,e,e]
+  play_pattern_timed [:e2,:e2,:g2,:e2,:e2,:a2,:a2,:a2],
+    [e,e,e,e,e,e,e,e]
+  play_pattern_timed [:e2,:e2,:g2,:e2,:e2,:a2,:a2,:b2],
+    [e,e,e,e,e,e,e,e]
+  play_pattern_timed [:e2,:e2,:g2,:e2,:e2,:a2,:a2,:a2],
+    [e,e,e,e,e,e,e,e]
+  play_pattern_timed [:e2,:e2,:g2,:e2,:e2,:a2,:a2,:g2],
+    [e,e,e,e,e,e,e,e]
+  play_pattern_timed [:e2,:e2,:g2,:e2,:e2,:a2,:a2,:a2],
+    [e,e,e,e,e,e,e,e]
+  play_pattern_timed [:e2,:e2,:g2,:e2,:r],[e,e,e,e,h]
+end
+
+define :bs_verse do
+  bs_intro
+end
+
+define :bs_chorus do
+  2.times do
+    play_pattern_timed [:a2,:a2,:a3,:a2,:a2,:a3,:a3,:gs3],
+      [e,e,e,e,e,e,e,e]
+    play_pattern_timed [:g2,:g2,:g3,:g2,:g2,:a2,:a2,:as2],
+      [e,e,e,e,e,e,e,e]
+    play_pattern_timed [:b2,:b2,:b3,:b2,:b2,:as3,:a3,:g3],
+      [e,e,e,e,e,e,e,e]
+    play_pattern_timed [:e2,:e2,:e2,:fs2,:fs2,:g2,:g2,:gs2],
+      [e,e,e,e,e,e,e,e]
+    play_pattern_timed [:a2,:a2,:a3,:a2,:a2,:a3,:a3,:gs3],
+      [e,e,e,e,e,e,e,e]
+    play_pattern_timed [:g2,:g2,:g3,:g2,:g2,:a2,:a2,:as2,],
+      [e,e,e,e,e,e,e,e]
+    play_pattern_timed [:b2,:b2,:b3,:b2,:b2,:as3,:a3,:g3],
+      [e,e,e,e,e,e,e,e]
+    play_pattern_timed [:r,:b3,:b3,:as3,:a3,:g3,:g3,:fs3],
+      [e,e,e,e,e,e,e,e]
+  end
+end
+
+define :bs_solo do
+  bs_riff
+end
+
+in_thread do
+  use_synth :fm
+  use_synth_defaults release: s, sustain: e, amp: 2, pan: 0.2
+  with_fx :distortion do
+    bs_intro
+    bs_riff
+    bs_verse
+    bs_chorus
+    bs_verse
+    bs_chorus
+    bs_intro
+    bs_solo
+    bs_chorus
+    bs_intro
+  end
+end
+
+#Guitar
+define :gt_intro do
+  3.times do
+    play_pattern_timed [:e3,:g3,:e3,:e3,:e3,:g3,:e3,:r,:e3],
+      [dq,q,q,e,q,e,e,e,dq]
+  end
+  play_pattern_timed [:e3,:g3,:e3,:e3,:e3,:g3,:e3,:as3,:a3,:g3],
+    [dq,q,q,e,q,e,e,e,e,q]
+end
+
+define :gt_riff do
+  play_pattern_timed [:e3,:e3,:g3,:e3,:e3,:a3,:a3,:a3],
+    [e,e,e,e,e,e,e,e]
+  play_pattern_timed [:e3,:e3,:g3,:e3,:e3,:a3,:a3,:g3],
+    [e,e,e,e,e,e,e,e]
+  play_pattern_timed [:e3,:e3,:g3,:e3,:e3,:a3,:a3,:a3],
+    [e,e,e,e,e,e,e,e]
+  play_pattern_timed [:e3,:e3,:g3,:e3,:e3,:a3,:a3,:b3],
+    [e,e,e,e,e,e,e,e]
+  play_pattern_timed [:e3,:e3,:g3,:e3,:e3,:a3,:a3,:a3],
+    [e,e,e,e,e,e,e,e]
+  play_pattern_timed [:e3,:e3,:g3,:e3,:e3,:a3,:a3,:g3],
+    [e,e,e,e,e,e,e,e]
+  play_pattern_timed [:e3,:e3,:g3,:e3,:e3,:a3,:a3,:a3],
+    [e,e,e,e,e,e,e,e]
+  play_pattern_timed [:e3,:e3,:g3,:e3,:r],[e,e,e,e,h]
+end
+
+define :gt_verse do
+  gt_intro
+end
+
+define :gt_chorus do
+  2.times do
+    play_pattern_timed [:a3,:a3,:a4,:a3,:a3,:a4,:a4,:gs4],
+      [e,e,e,e,e,e,e,e]
+    play_pattern_timed [:g3,:g3,:g4,:g3,:g3,:a3,:a3,:as3,],
+      [e,e,e,e,e,e,e,e]
+    play_pattern_timed [:b3,:b3,:b4,:b3,:b3,:as4,:a4,:g4],
+      [e,e,e,e,e,e,e,e]
+    play_pattern_timed [:e3,:e3,:e4,:fs3,:fs3,:g3,:g3,:gs3],
+      [e,e,e,e,e,e,e,e]
+    play_pattern_timed [:a3,:a3,:a4,:a3,:a3,:a4,:a4,:gs4],
+      [e,e,e,e,e,e,e,e]
+    play_pattern_timed [:g3,:g3,:g4,:g3,:g3,:a3,:a3,:as3,],
+      [e,e,e,e,e,e,e,e]
+    play_pattern_timed [:b3,:b3,:b4,:b3,:b3,:as4,:a4,:g4],
+      [e,e,e,e,e,e,e,e]
+    play_pattern_timed [:r,:b4,:b4,:as4,:a4,:g4,:g4,:fs4],
+      [e,e,e,e,e,e,e,e]
+  end
+end
+
+define :gt_solo do
+  with_fx :bitcrusher do
+    gt_intro
+  end
+end
+
+in_thread do
+  use_synth :blade
+  use_synth_defaults amp: 0.5, pan: -0.2
+  with_fx :reverb do
+    with_fx :rhpf, cutoff: 70 do
+      with_fx :distortion, distort: 0.7 do
+        gt_intro
+        gt_riff
+        gt_verse
+        gt_chorus
+        gt_verse
+        gt_chorus
+        gt_intro
+        gt_solo
+        gt_chorus
+        gt_intro
+      end
+    end
+  end
+end
+
+#Voice
+define :vc_intro do
+  sleep 8*w
+end
+
+define :vc_riff do
+  sleep 8*w
+end
+
+define :vc_verse do
+  2.times do
+    play_pattern_timed [:r,:b3,:a3,:a3,:g3,:a3,:g3,:b3,:a3,:a3,:g3,],
+      [q,e,e,e,e,e,e,q,e,q,dq]
+    play_pattern_timed [:r,:b3,:a3,:a3,:g3,:a3,:g3,:b3,:d4,:b3],
+      [q,e,e,e,e,e,e,q,e,h+e]
+  end
+end
+
+define :vc_chorus do
+  2.times do
+    play_pattern_timed [:a3,:gs3,:g3,:fs3,:e3,:fs3,:e3,:r,:g3,:e3,:r],
+      [h+q+e,e,w,dq,e,e,e,e,q,h,dq]
+  end
+  play_pattern_timed [:a3,:a3,:a3,:a3,:a3,:gs3,:g3,:g3,:g3,:g3,:g3,:fs3],
+    [q,q,e,e,e,e,e,q,q,e,e,e]
+  play_pattern_timed [:fs3,:fs3,:fs3,:fs3,:e3,:fs3,:e3,:g3,:e3,:fs3,:g3,:gs3],
+    [e,e,q,e,e,e,e,e,q,q,q,e]
+  play_pattern_timed [:a3,:a3,:a3,:a3,:a3,:gs3,:g3,:g3,:g3,:g3,:g3,:fs3],
+    [q,q,e,e,e,e,e,q,q,e,e,e]
+  play_pattern_timed [:fs3,:fs3,:fs3,:fs3,:e3,:fs3,:e3,:r],[e,e,q,e,e,e,e,w]
+end
+
+define :vc_solo do
+  sleep 8*w
+end
+
+define :vc_interlude do
+  with_fx :distortion do
+    4.times do
+      sleep w
+      play :e3, sustain: dh, release: e, amp: 0.5
+      sleep w
+    end
+  end
+end
+
+in_thread do
+  use_synth :saw
+  use_synth_defaults amp: 1.5
+  vc_intro
+  vc_riff
+  vc_verse
+  vc_chorus
+  vc_verse
+  vc_chorus
+  vc_interlude
+  vc_solo
+  vc_chorus
+  vc_intro
+end
