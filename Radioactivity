@@ -1,0 +1,222 @@
+#Radioactivity - Kraftwerk
+#Coded by Davids Fiddle
+
+use_bpm 120
+
+h = 2
+q = 1
+e = 0.5
+s = 0.25
+
+#Uncomment this to sing the lyrics yourself
+comment do
+  live_loop :in do
+    with_fx :reverb do
+      with_fx :ring_mod do
+        synth :sound_in, amp: 3
+        sleep 1
+      end
+    end
+  end
+end
+
+
+#Beat
+define :eight do
+  8.times do
+    sample :drum_cymbal_closed, hpf: 90
+    sleep e
+  end
+end
+define :dada do
+  sample :drum_snare_soft
+  sleep q
+  sample :drum_snare_soft
+  sleep q
+  with_fx :reverb do
+    sample :drum_cymbal_closed, amp: 2
+    sleep h
+  end
+end
+
+in_thread do
+  20.times do
+    eight
+  end
+  24.times do
+    dada
+  end
+  8.times do
+    eight
+  end
+  12.times do
+    dada
+  end
+end
+
+#FX
+in_thread do
+  sleep 14*4
+  make_noise
+  sleep 2*4
+  make_noise
+  sleep 8*4
+  4.times do
+    cue :radio
+    sleep 4*4
+  end
+  sleep 2*4
+  make_noise
+  sleep 2*4
+  make_noise
+  sleep 8*4
+  cue :radio
+end
+
+#Bass
+define :bs_a do
+  play_pattern_timed [:a2,:a2,:a2,:a2,:a2,:a2,:a2,:a2],
+    [e,e,e,e,e,e,e,e]
+end
+define :bs_f do
+  play_pattern_timed [:f2,:f2,:f2,:f2,:f2,:f2,:f2,:f2],
+    [e,e,e,e,e,e,e,e]
+end
+
+in_thread do
+  use_synth :dpulse
+  use_synth_defaults sustain: 0.2, release: 0.2,
+    amp: 0.5
+  sleep 4*4
+  8.times do
+    bs_a
+  end
+  6.times do
+    4.times do
+      bs_a
+    end
+    4.times do
+      bs_f
+    end
+  end
+  4.times do
+    bs_a
+  end
+end
+
+#Pad
+in_thread do
+  use_synth :dark_ambience
+  use_synth_defaults
+  sleep 2*4
+  pad = play :a3, sustain: 18*4
+  sleep 14*4
+  control pad, note: :f3
+  sleep 8*4
+  pad = play :a3, sustain: 24*4
+  sleep 4*4
+  control pad, note: :f3
+  sleep 4*4
+  control pad, note: :a3
+  sleep 4*4
+  control pad, note: :f3
+  sleep 4*4
+  control pad, note: :f3
+  sleep 4*4
+  control pad, note: :a3
+  sleep 4*4
+  control pad, note: :f3
+end
+
+#Lead
+define :lead_a do
+  sleep 4
+  sleep 3.5
+  play_pattern_timed [:e3,:a3,:a3,:g3,:a3,:e3,:a3,:c4,:b3,:a3,:r],
+    [e,q,e,e,e,q,e,q,e,h,e]
+end
+define :lead_f do
+  sleep 4
+  sleep 3.5
+  play_pattern_timed [:c3,:f3,:f3,:e3,:f3,:c3,:f3,:a3,:g3,:f3,:r],
+    [e,q,e,e,e,q,e,q,e,h,e]
+end
+with_fx :reverb do
+  with_fx :flanger do
+    in_thread do
+      use_synth :piano
+      use_synth_defaults
+      sleep 10*4
+      2.times do
+        lead_a
+        lead_f
+      end
+      sleep 16*4
+      2.times do
+        lead_a
+        lead_f
+      end
+    end
+  end
+end
+
+#Play Morsecode
+define :play_morse do |letter, note|
+  l = 0.6
+  s = 0.2
+  times = case letter
+  when 'a' then [s,l]
+  when 'b' then [l,s,s,s]
+  when 'c' then [l,s,l,s]
+  when 'd' then [l,s,s]
+  when 'e' then [s]
+  when 'f' then [s,s,l,s]
+  when 'g' then [e,l,s]
+  when 'h' then [s,s,s,s]
+  when 'i' then [s,s]
+  when 'j' then [s,e,l,l]
+  when 'k' then [e,s,l]
+  when 'l' then [s,l,s,s]
+  when 'm' then [l,l]
+  when 'n' then [l,s]
+  when 'o' then [l,l,l]
+  when 'p' then [s,l,l,s]
+  when 'q' then [l,l,s,l]
+  when 'r' then [s,l,s]
+  when 's' then [s,s,s]
+  when 't' then [l]
+  when 'u' then [s,s,l]
+  when 'v' then [s,s,s,l]
+  when 'w' then [s,l,l]
+  when 'x' then [l,s,s,l]
+  when 'y' then [l,s,l,l]
+  when 'z' then [l,l,s,s]
+  end
+  play_pattern_timed (knit note, times.length),times
+  sleep 0.2
+end
+
+define :play_morse_text do |text|
+  use_synth :beep
+  use_synth_defaults release: 0.2
+  for x in (range 0,text.length) do
+      play_morse text[x],:a5
+      sleep 0.6
+    end
+  end
+  
+  in_thread do
+    loop do
+      sync :radio
+      play_morse_text "radioactivity"
+    end
+  end
+  
+  define :make_noise do
+    noise = synth :noise, sustain: 0.5,
+      release: 7.5, cutoff: 120,
+      cutoff_slide: 6, amp: 0.5
+    sleep 3
+    control noise, cutoff: 70
+    sleep 5
+  end
