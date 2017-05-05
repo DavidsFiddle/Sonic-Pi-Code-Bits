@@ -1,0 +1,56 @@
+#Emphasis - Pi Jam
+#Coded by Davids Fiddle
+use_bpm 120
+
+amp_saw = 0.5
+amp_echo = 0
+
+with_fx :reverb do
+  live_loop :bd do
+    sample :bd_tek
+    sleep 1
+    sample :bd_tek
+    sample :drum_snare_soft
+    sleep 1
+  end
+end
+
+with_fx :reverb do
+  with_fx :flanger do
+    with_fx :slicer, phase: 0.5, phase_offset: 0.5, smooth_up: 0.5 do
+      live_loop :bass do
+        use_synth :fm
+        use_synth_defaults divisor: 1
+        play_pattern_timed [:g2,:d2,:b2,:c3],[8,8,8,8]
+      end
+    end
+  end
+end
+
+live_loop :drum_echo do
+  sleep 1
+  with_fx :hpf do
+    with_fx :echo do
+      2.times do
+        sample :drum_snare_hard, amp: amp_echo
+        sleep 2
+      end
+    end
+  end
+  sleep 3
+end
+
+live_loop :fool do
+  with_fx :lpf do
+    with_fx :krush do
+      with_fx :gverb do
+        use_synth :blade
+        use_synth_defaults vibrato_depth: 0, attack: 1,
+          release: 1.5, amp: amp_saw
+        sleep 4
+        play (ring :g2,:d2,:b2,:c3).tick
+        sleep 4
+      end
+    end
+  end
+end
