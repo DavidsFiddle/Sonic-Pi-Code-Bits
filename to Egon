@@ -1,0 +1,43 @@
+#to Egon
+#Coded by Davids Fiddle
+
+use_random_seed 665
+
+amp_gozer = 0#1.5
+amp_zuul = 0#0.5
+amp_vinz = 0#1.1
+amp_clortho = 0#0.5
+
+live_loop :gozer do
+  use_synth :subpulse
+  use_synth_defaults amp: amp_gozer, cutoff: 120
+  play (chord :a2, :sus4, num_octaves: 2).choose
+  sleep (knit 1,4,0.5,3,0.75,1,0.25,3).choose
+end
+
+with_fx :compressor do
+  with_fx :panslicer, pan_max: 0.4, pan_min: -0.4, phase: 0.25 do
+    live_loop :zuul do
+      use_synth :tech_saws
+      use_synth_defaults attack: 0.25, decay: 0.25, sustain: 3,
+        release: 0.5, amp: amp_zuul
+      play :a2
+      sleep 4
+    end
+  end
+end
+
+live_loop :vinz do
+  sample :loop_mika, amp: amp_vinz
+  sleep sample_duration :loop_mika
+end
+
+with_fx :compressor do
+  live_loop :clortho do
+    use_synth :hoover
+    use_synth_defaults sustain: 6, release: 2, amp: amp_clortho,
+      pan: [-0.2,0,0.2].choose
+    play :a4
+    sleep 8
+  end
+end
