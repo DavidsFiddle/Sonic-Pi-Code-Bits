@@ -214,3 +214,4 @@ with_fx :reverb, mix: 0, mix_slide: 1, room: 0.6, room_slide: 1 do |effect|
     control effect, room: verb_room
   end
 end
+
