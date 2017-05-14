@@ -1,0 +1,179 @@
+//DF-00 Drum Machine
+//Coded by Davids Fiddle
+
+
+import oscP5.*;                   //Needs oscP5 and controlP5 libraries
+import netP5.*;                   
+import controlP5.*;
+
+OscP5 oscP5;                      //Communication
+NetAddress sonicPi;               //where the messages go
+ControlP5 cp5;                    //Interface
+
+boolean enableComms = true;
+
+void setup() {
+
+  size(1000, 600, P3D);  //set up window
+  smooth();    
+  //Network adress to communicate with Sonic Pi
+  oscP5 = new OscP5(this, 8000);                  
+  sonicPi = new NetAddress("127.0.0.1", 4559);
+
+  createUI();                              
+  enableComms = true;
+}
+
+//Methods for sending key/value to Sonic Pi
+void sendOsc(String name, int value) {
+  OscMessage toSend = new OscMessage("/" + name);
+  toSend.add((int)value);
+  oscP5.send(toSend, sonicPi);
+}
+void sendOsc(String name, float value) {
+  OscMessage toSend = new OscMessage("/" + name);
+  toSend.add((float)value);
+  oscP5.send(toSend, sonicPi);
+}
+
+//fill in the Background
+void draw() {
+  background(30);
+  drawBackground();
+}
+
+//Draw all lines
+void drawBackground() {
+  fill(0);
+
+  stroke(255);
+  line(100, 0, 100, 600);
+  line(0, 100, 1000, 100);
+  line(300, 0, 300, 100);
+  line(800, 0, 800, 100);
+}
+
+void createUI() {
+  //create canvas for the controls
+  cp5 = new ControlP5(this);
+
+  //Labels
+  cp5.addTextlabel("title").setText("DF-00 Drum Machine \nby Davids Fiddle").setPosition(325, 25).setFont(createFont("Georgia", 20));
+  cp5.addTextlabel("thanks").setText("Running with Sonic Pi\nby Sam Aaron\nand Processing 3\nby Ben Fry and Casey Reas").setPosition(825, 25).setFont(createFont("Georgia", 12));
+  cp5.addTextlabel("Version").setText("v.0.9").setPosition(750, 75).setFont(createFont("Georgia", 12));
+
+  //Speed control
+  cp5.addKnob("speed").setRange(50, 220).setValue(90).setPosition(25, 25).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Speed").setDecimalPrecision(0);
+
+  //Global reverb
+  cp5.addKnob("verbMix").setRange(0, 1).setValue(0).setPosition(125, 25).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Reverb").setDecimalPrecision(2);
+  cp5.addKnob("verbRoom").setRange(0, 1).setValue(0.6).setPosition(225, 25).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Room").setDecimalPrecision(2);
+
+  //Volume knobs
+  cp5.addKnob("volKik").setRange(0, 2.0).setValue(1.0).setPosition(25, 125).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Kick").setDecimalPrecision(1);
+  cp5.addKnob("volHihat").setRange(0, 2.0).setValue(1.0).setPosition(25, 225).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Hihat").setDecimalPrecision(1);
+  cp5.addKnob("volSnare").setRange(0, 2.0).setValue(1.0).setPosition(25, 325).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Snare").setDecimalPrecision(1);
+  cp5.addKnob("volToms").setRange(0, 2.0).setValue(1.0).setPosition(25, 425).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Toms").setDecimalPrecision(1);
+  cp5.addKnob("volMisc").setRange(0, 2.0).setValue(1.0).setPosition(25, 525).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Misc").setDecimalPrecision(1);
+
+  //Sample selectors
+  cp5.addRadioButton("kikSample").setPosition(850, 125).setItemsPerRow(2).setItemWidth(75).setItemHeight(25)
+    .addItem("Acoustic", 0).addItem("Ada", 1).addItem("Haus", 2).addItem("Sone", 3).align(CENTER, CENTER)
+    .activate(0).setNoneSelectedAllowed(false);
+
+  cp5.addRadioButton("hihatSample1").setPosition(850, 225).setItemsPerRow(2).setItemWidth(75).setItemHeight(25)
+    .addItem("Pedal", 0).addItem("Closed", 1).align(CENTER, CENTER)
+    .activate(0).setNoneSelectedAllowed(false);
+  cp5.addRadioButton("hihatSample2").setPosition(850, 250).setItemsPerRow(2).setItemWidth(75).setItemHeight(25)
+    .addItem("Closed ", 0).addItem("Open", 1).align(CENTER, CENTER)
+    .activate(0).setNoneSelectedAllowed(false);
+
+  cp5.addRadioButton("snareSample").setPosition(850, 325).setItemsPerRow(2).setItemWidth(75).setItemHeight(25)
+    .addItem("Snare", 0).addItem("Dub", 1).addItem("Dolf", 2).addItem("Zome", 3).align(CENTER, CENTER)
+    .activate(0).setNoneSelectedAllowed(false);
+
+  //Pattern selectors
+  cp5.addRadioButton("kikPattern").setPosition(125, 125).setItemsPerRow(8).setItemWidth(100).setItemHeight(50)
+    .addItem("kik Off", 0).addItem("kik 1", 1).addItem("kik 2", 2).addItem("kik 3", 3).addItem("kik 4", 4).addItem("kik 5", 5).addItem("kik 6", 6).align(CENTER, CENTER)
+    .activate(1).setNoneSelectedAllowed(false);
+
+  cp5.addRadioButton("hihatPattern").setPosition(125, 225).setItemsPerRow(8).setItemWidth(100).setItemHeight(50)
+    .addItem("hihat Off", 0).addItem("hihat 1", 1).addItem("hihat 2", 2).addItem("hihat 3", 3).addItem("hihat 4", 4).addItem("hihat 5", 5).addItem("hihat 6", 6).align(CENTER, CENTER)
+    .activate(1).setNoneSelectedAllowed(false);
+
+  cp5.addRadioButton("snarePattern").setPosition(125, 325).setItemsPerRow(8).setItemWidth(100).setItemHeight(50)
+    .addItem("snare Off", 0).addItem("snare 1", 1).addItem("snare 2", 2).addItem("snare 3", 3).addItem("snare 4", 4).addItem("snare 5", 5).addItem("snare 6", 6).align(CENTER, CENTER)
+    .activate(1).setNoneSelectedAllowed(false);
+
+  cp5.addRadioButton("tomPattern").setPosition(125, 425).setItemsPerRow(8).setItemWidth(100).setItemHeight(50)
+    .addItem("tom Off", 0).addItem("tom 1", 1).addItem("tom 2", 2).addItem("tom 3", 3).addItem("tom 4", 4).addItem("tom 5", 5).addItem("tom 6", 6).addItem("tom 7", 7).align(CENTER, CENTER)
+    .activate(0).setNoneSelectedAllowed(false);
+
+  cp5.addRadioButton("miscPattern").setPosition(125, 525).setItemsPerRow(8).setItemWidth(100).setItemHeight(50)
+    .addItem("misc Off", 0).addItem("misc 1", 1).addItem("misc 2", 2).addItem("misc 3", 3).addItem("misc 4", 4).addItem("misc 5", 5).addItem("misc 6", 6).addItem("misc 7", 7).align(CENTER, CENTER)
+    .activate(0).setNoneSelectedAllowed(false);
+}
+
+
+//Sending osc-syncs
+
+//Samples
+void kikSample(int Value) {
+  sendOsc("00_sam_kik", Value);
+}
+void hihatSample1(int Value) {
+  sendOsc("00_sam_hihat1", Value);
+}
+void hihatSample2(int Value) {
+  sendOsc("00_sam_hihat2", Value);
+}
+void snareSample(int Value) {
+  sendOsc("00_sam_snare", Value);
+}
+
+//Speed
+void speed(float Value) {
+  sendOsc("00_speed", Value);
+}
+
+//Reverb
+void verbMix(float Value) {
+  sendOsc("00_verb_mix", Value);
+}
+void verbRoom(float Value) {
+  sendOsc("00_verb_room", Value);
+}
+
+//Volume
+void volKik(float Value) {
+  sendOsc("00_amp_kik", Value);
+}
+void volHihat(float Value) {
+  sendOsc("00_amp_hihat", Value);
+}
+void volSnare(float Value) {
+  sendOsc("00_amp_snare", Value);
+}
+void volTom(float Value) {
+  sendOsc("00_amp_tom", Value);
+}
+void volMisc(float Value) {
+  sendOsc("00_amp_misc", Value);
+}
+
+//pattern selector
+void kikPattern(int Value) {
+  sendOsc("00_pat_kik", Value);
+}
+void hihatPattern(int Value) {
+  sendOsc("00_pat_hihat", Value);
+}
+void snarePattern(int Value) {
+  sendOsc("00_pat_snare", Value);
+}
+void tomPattern(int Value) {
+  sendOsc("00_pat_tom", Value);
+}
+void miscPattern(int Value) {
+  sendOsc("00_pat_misc", Value);
+}
