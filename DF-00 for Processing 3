@@ -1,5 +1,6 @@
 //DF-00 Drum Machine
 //Coded by Davids Fiddle
+//v1.0
 
 
 import oscP5.*;                   //Needs oscP5 and controlP5 libraries
@@ -11,6 +12,7 @@ NetAddress sonicPi;               //where the messages go
 ControlP5 cp5;                    //Interface
 
 boolean enableComms = true;
+PFont pfont12, pfont20;
 
 void setup() {
 
@@ -19,6 +21,9 @@ void setup() {
   //Network adress to communicate with Sonic Pi
   oscP5 = new OscP5(this, 8000);                  
   sonicPi = new NetAddress("127.0.0.1", 4559);
+  //Creating Fonts
+  pfont20 = createFont("Georgia", 20, true);
+  pfont12 = createFont("Georgia", 12, true);
 
   createUI();                              
   enableComms = true;
@@ -51,30 +56,40 @@ void drawBackground() {
   line(0, 100, 1000, 100);
   line(300, 0, 300, 100);
   line(800, 0, 800, 100);
+  
+  stroke(100);
+  line(0,200,1000,200);
+  line(0,300,1000,300);
+  line(0,400,1000,400);
+  line(0,500,1000,500);
 }
 
 void createUI() {
+  //Initialising Fonts
+  ControlFont fontl = new ControlFont(pfont20);
+  ControlFont fonts = new ControlFont(pfont12);
+  
   //create canvas for the controls
   cp5 = new ControlP5(this);
 
   //Labels
-  cp5.addTextlabel("title").setText("DF-00 Drum Machine \nby Davids Fiddle").setPosition(325, 25).setFont(createFont("Georgia", 20));
-  cp5.addTextlabel("thanks").setText("Running with Sonic Pi\nby Sam Aaron\nand Processing 3\nby Ben Fry and Casey Reas").setPosition(825, 25).setFont(createFont("Georgia", 12));
-  cp5.addTextlabel("Version").setText("v.0.9").setPosition(750, 75).setFont(createFont("Georgia", 12));
+  cp5.addTextlabel("title").setText("DF-00 Drum Machine \nby Davids Fiddle").setPosition(325, 25).setFont(fontl);
+  cp5.addTextlabel("thanks").setText("Running with Sonic Pi\nby Sam Aaron\nand Processing 3\nby Ben Fry and Casey Reas").setPosition(825, 25).setFont(fonts);
+  cp5.addTextlabel("Version").setText("v1.0").setPosition(750, 75).setFont(fonts);
 
   //Speed control
-  cp5.addKnob("speed").setRange(50, 220).setValue(90).setPosition(25, 25).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Speed").setDecimalPrecision(0);
+  cp5.addKnob("speed").setRange(50, 220).setValue(90).setPosition(25, 25).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Speed").setDecimalPrecision(0).setFont(fonts);
 
   //Global reverb
-  cp5.addKnob("verbMix").setRange(0, 1).setValue(0).setPosition(125, 25).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Reverb").setDecimalPrecision(2);
-  cp5.addKnob("verbRoom").setRange(0, 1).setValue(0.6).setPosition(225, 25).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Room").setDecimalPrecision(2);
+  cp5.addKnob("verbMix").setRange(0, 1).setValue(0).setPosition(125, 25).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Reverb").setDecimalPrecision(2).setFont(fonts);
+  cp5.addKnob("verbRoom").setRange(0, 1).setValue(0.6).setPosition(225, 25).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Room").setDecimalPrecision(2).setFont(fonts);
 
   //Volume knobs
-  cp5.addKnob("volKik").setRange(0, 2.0).setValue(1.0).setPosition(25, 125).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Kick").setDecimalPrecision(1);
-  cp5.addKnob("volHihat").setRange(0, 2.0).setValue(1.0).setPosition(25, 225).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Hihat").setDecimalPrecision(1);
-  cp5.addKnob("volSnare").setRange(0, 2.0).setValue(1.0).setPosition(25, 325).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Snare").setDecimalPrecision(1);
-  cp5.addKnob("volToms").setRange(0, 2.0).setValue(1.0).setPosition(25, 425).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Toms").setDecimalPrecision(1);
-  cp5.addKnob("volMisc").setRange(0, 2.0).setValue(1.0).setPosition(25, 525).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Misc").setDecimalPrecision(1);
+  cp5.addKnob("volKik").setRange(0, 2.0).setValue(1.0).setPosition(25, 125).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Kick").setDecimalPrecision(1).setFont(fonts);
+  cp5.addKnob("volHihat").setRange(0, 2.0).setValue(1.0).setPosition(25, 225).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Hihat").setDecimalPrecision(1).setFont(fonts);
+  cp5.addKnob("volSnare").setRange(0, 2.0).setValue(1.0).setPosition(25, 325).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Snare").setDecimalPrecision(1).setFont(fonts);
+  cp5.addKnob("volToms").setRange(0, 2.0).setValue(1.0).setPosition(25, 425).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Toms").setDecimalPrecision(1).setFont(fonts);
+  cp5.addKnob("volMisc").setRange(0, 2.0).setValue(1.0).setPosition(25, 525).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Misc").setDecimalPrecision(1).setFont(fonts);
 
   //Sample selectors
   cp5.addRadioButton("kikSample").setPosition(850, 125).setItemsPerRow(2).setItemWidth(75).setItemHeight(25)
@@ -95,15 +110,15 @@ void createUI() {
   //Pattern selectors
   cp5.addRadioButton("kikPattern").setPosition(125, 125).setItemsPerRow(8).setItemWidth(100).setItemHeight(50)
     .addItem("kik Off", 0).addItem("kik 1", 1).addItem("kik 2", 2).addItem("kik 3", 3).addItem("kik 4", 4).addItem("kik 5", 5).addItem("kik 6", 6).align(CENTER, CENTER)
-    .activate(1).setNoneSelectedAllowed(false);
+    .activate(0).setNoneSelectedAllowed(false);
 
   cp5.addRadioButton("hihatPattern").setPosition(125, 225).setItemsPerRow(8).setItemWidth(100).setItemHeight(50)
     .addItem("hihat Off", 0).addItem("hihat 1", 1).addItem("hihat 2", 2).addItem("hihat 3", 3).addItem("hihat 4", 4).addItem("hihat 5", 5).addItem("hihat 6", 6).align(CENTER, CENTER)
-    .activate(1).setNoneSelectedAllowed(false);
+    .activate(0).setNoneSelectedAllowed(false);
 
   cp5.addRadioButton("snarePattern").setPosition(125, 325).setItemsPerRow(8).setItemWidth(100).setItemHeight(50)
     .addItem("snare Off", 0).addItem("snare 1", 1).addItem("snare 2", 2).addItem("snare 3", 3).addItem("snare 4", 4).addItem("snare 5", 5).addItem("snare 6", 6).align(CENTER, CENTER)
-    .activate(1).setNoneSelectedAllowed(false);
+    .activate(0).setNoneSelectedAllowed(false);
 
   cp5.addRadioButton("tomPattern").setPosition(125, 425).setItemsPerRow(8).setItemWidth(100).setItemHeight(50)
     .addItem("tom Off", 0).addItem("tom 1", 1).addItem("tom 2", 2).addItem("tom 3", 3).addItem("tom 4", 4).addItem("tom 5", 5).addItem("tom 6", 6).addItem("tom 7", 7).align(CENTER, CENTER)
@@ -115,7 +130,7 @@ void createUI() {
 }
 
 
-//Sending osc-syncs
+//Sending osc-messages
 
 //Samples
 void kikSample(int Value) {
