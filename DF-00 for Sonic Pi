@@ -1,5 +1,6 @@
 #DF-00 Drum Machine
 #Coded by Davids Fiddle
+#v1.0
 
 #globals:
 #volume
@@ -91,21 +92,21 @@ live_loop :get_pat_tom do
   pat_tom = [0,0,1,2,0,0,0,0] if val[0] == 1
   pat_tom = [0,0,0,0,3,1,0,0] if val[0] == 2
   pat_tom = [0,0,1,0,0,2,3,0] if val[0] == 3
-  pat_tom = [0,0,0,0,0,0,0,0] if val[0] == 4
-  pat_tom = [0,0,0,0,0,0,0,0] if val[0] == 5
-  pat_tom = [0,0,0,0,0,0,0,0] if val[0] == 6
-  pat_tom = [0,0,0,0,0,0,0,0] if val[0] == 7
+  pat_tom = [1,2,0,0,0,3,0,1] if val[0] == 4
+  pat_tom = [0,0,0,1,0,0,0,2] if val[0] == 5
+  pat_tom = [0,0,0,3,0,2,0,1] if val[0] == 6
+  pat_tom = [0,3,0,2,0,1,0,0] if val[0] == 7
 end
 live_loop :get_pat_misc do
   val = sync "/00_pat_misc"
   pat_misc = [0,0,0,0,0,0,0,0] if val[0] == 0
-  pat_misc = [0,0,0,0,0,0,0,0] if val[0] == 1
-  pat_misc = [0,0,0,0,0,0,0,0] if val[0] == 2
-  pat_misc = [0,0,0,0,0,0,0,0] if val[0] == 3
-  pat_misc = [0,0,0,0,0,0,0,0] if val[0] == 4
-  pat_misc = [0,0,0,0,0,0,0,0] if val[0] == 5
-  pat_misc = [0,0,0,0,0,0,0,0] if val[0] == 6
-  pat_misc = [0,0,0,0,0,0,0,0] if val[0] == 7
+  pat_misc = [0,2,0,0,0,0,0,0] if val[0] == 1
+  pat_misc = [0,2,0,0,0,2,0,0] if val[0] == 2
+  pat_misc = [0,1,1,0,1,1,0,0] if val[0] == 3
+  pat_misc = [3,3,0,0,0,0,0,0] if val[0] == 4
+  pat_misc = [0,4,0,0,0,4,4,0] if val[0] == 5
+  pat_misc = [0,4,0,0,0,2,4,0] if val[0] == 6
+  pat_misc = [0,4,0,2,0,0,1,0] if val[0] == 7
 end
 #FX
 live_loop :get_speed do
@@ -214,4 +215,3 @@ with_fx :reverb, mix: 0, mix_slide: 1, room: 0.6, room_slide: 1 do |effect|
     control effect, room: verb_room
   end
 end
-
