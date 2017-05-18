@@ -1,0 +1,14 @@
+How to use the DF-xx instruments
+
+Copy the code 'for Sonic Pi' into an empty buffer in Sonic Pi.
+When using multiple instruments, copy them into different buffers.
+Copy the code 'for Processing 3' into Processing3.
+
+In Sonic Pi, run the code of all instruments you want to use.
+in Processing 3, run the code, this should open the UI window.
+
+Because all instruments get their heartbeat from the DF-00, it has to run always.
+If you don't need it, turn down the volume or set all patterns to 'off'(this is the default.)
+
+
+Please report any problems.
