@@ -1,0 +1,26 @@
+#Temple
+#Coded by Davids Fiddle
+
+
+live_loop :ambi do
+  tick
+  use_synth :dark_ambience
+  play_chord (chord (ring :a3,:d3,:f3).look, (ring :major, :minor).look),
+    sustain: 1.5, release: 2, amp: 2
+  sleep 2
+end
+
+live_loop :high do
+  use_synth :dark_ambience
+  play (knit :a4,6,:a3,2).choose, sustain: 6, release: 1, amp: 0
+  sleep 6
+end
+
+with_fx :reverb do
+  live_loop :player do
+    use_synth :pluck
+    play (knit :d4,4,:e4,2,:f4,4,:g4,2,:a4,4).choose, amp: 0,
+      pan: (knit 0,2,0.1,3,0.2,1).choose
+    sleep (knit 0.25,4,0.5,6,0.75,3,1,2).choose
+  end
+end
