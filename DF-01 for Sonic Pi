@@ -1,0 +1,234 @@
+#DF-01 Bass
+#Coded by Davids Fiddle
+#v0.9
+
+#globals:
+#main synth settings
+volume = 1
+att = 0
+dec = 0
+sus = 0
+rel = 1
+source = :beep
+#secondary synth settings
+volume2 = 0
+source2 = :beep
+trans = 0   #-12 - 12
+ixi2_mix = 0
+flan2_mix = 0
+bc2_mix = 0
+#sequencer settings
+note0 = 31
+note1 = 31
+note2 = 31
+note3 = 31
+note4 = 31
+note5 = 31
+note6 = 31
+note7 = 31
+#FX
+cut_mix = 0
+cut_freq = 120
+verb_mix = 0
+verb_room = 0.6
+ixi_mix = 0
+ixi_phase = 4 #0.25 - 8
+flan_mix = 0
+flan_phase = 4 #0.25 - 8
+bc_mix = 0
+bc_depth = 8 #1 - 16
+
+#get OSC messages
+#volume
+live_loop :get_volume do
+  val = sync "/01_amp"
+  volume = val[0]
+end
+live_loop :get_att do
+  val = sync "/01_att"
+  att = val[0]
+end
+live_loop :get_dec do
+  val = sync "/01_dec"
+  dec = val[0]
+end
+live_loop :get_sus do
+  val = sync "/01_sus"
+  sus = val[0]
+end
+live_loop :get_rel do
+  val = sync "/01_rel"
+  rel = val[0]
+end
+live_loop :get_source do
+  val = sync "/01_source"
+  source = :beep if val[0] == 0
+  source = :hoover if val[0] == 1
+  source = :tb303  if val[0] == 2
+  source = :pulse if val[0] == 3
+end
+#Sequencer
+live_loop :get_note0 do
+  val = sync "/01_notes0"
+  note0 = val[0]
+  
+end
+live_loop :get_note1 do
+  val = sync "/01_notes1"
+  note1 = val[0]
+  
+end
+live_loop :get_note2 do
+  val = sync "/01_notes2"
+  note2 = val[0]
+  
+end
+live_loop :get_note3 do
+  val = sync "/01_notes3"
+  note3 = val[0]
+end
+live_loop :get_note4 do
+  val = sync "/01_notes4"
+  note4 = val[0]
+end
+live_loop :get_note5 do
+  val = sync "/01_notes5"
+  note5 = val[0]
+end
+live_loop :get_note6 do
+  val = sync "/01_notes6"
+  note6 = val[0]
+end
+live_loop :get_note7 do
+  val = sync "/01_notes7"
+  note7 = val[0]
+end
+#secondary synth
+live_loop :get_source2 do
+  val = sync "/01_source2"
+  source2 = :beep if val[0] == 0
+  source2 = :pluck if val[0] == 1
+  source2 = :blade  if val[0] == 2
+  source2 = :pulse if val[0] == 3
+end
+live_loop :get_volume2 do
+  val = sync "/01_amp2"
+  volume2 = val[0]
+end
+live_loop :get_transpose do
+  val = sync "/01_transpose"
+  trans = val[0]
+end
+
+
+
+#Play:
+
+with_fx :lpf, mix: cut_mix, mix_slide: 1, cutoff: cut_freq, cutoff_slide: 100 do |cutter|
+  with_fx :reverb, mix: verb_mix, mix_slide: 1, room: verb_room, room_slide: 1 do |verb|
+    #global fx:
+    live_loop :get_verb_mix do
+      val = sync "/01_verb_mix"
+      verb_mix = val[0]
+      control verb, mix: verb_mix
+    end
+    live_loop :get_verb_room do
+      val = sync "/01_verb_room"
+      verb_room = val[0]
+      control verb, room: verb_room
+    end
+    live_loop :get_cut_mix do
+      val = sync "/01_cut_mix"
+      cut_mix = val[0]
+      control cutter, mix: cut_mix
+    end
+    live_loop :get_cut_freq do
+      val = sync "/01_cut_freq"
+      cut_freq = val[0]
+      control cutter, cutoff: cut_freq
+    end
+    #Main Synth
+    with_fx :flanger, mix: flan_mix, mix_slide: 1, phase: flan_phase, phase_slide: 1 do |flan|
+      with_fx :bitcrusher, mix: bc_mix, mix_slide: 1, bits: bc_depth, bits_slide: 1 do |bc|
+        with_fx :ixi_techno, mix: ixi_mix, mix_slide: 1, phase: ixi_phase, phase_slide: 1 do |ixi|
+          live_loop :play_bass do
+            sync :heartbeat
+            tick
+            use_synth source
+            use_synth_defaults amp: volume, attack: att, decay: dec, sustain: sus, release: rel, sustain_level: 0.8
+            play [note0,:r,:r,:r,note1,:r,:r,:r,note2,:r,:r,:r,note3,:r,:r,:r,note4,:r,:r,:r,note5,:r,:r,:r,note6,:r,:r,:r,note7,:r,:r,:r].ring.look
+          end
+          
+          #FX
+          live_loop :get_ixi_mix do
+            val = sync "/01_ixi_mix"
+            ixi_mix = val[0]
+            control ixi, mix: ixi_mix
+          end
+          live_loop :get_ixi_phase do
+            val = sync "/01_ixi_phase"
+            ixi_phase = val[0]
+            control ixi, phase: ixi_phase
+          end
+          live_loop :get_flan_mix do
+            val = sync "/01_flan_mix"
+            flan_mix = val[0]
+            control flan, mix: flan_mix
+          end
+          live_loop :get_flan_phase do
+            val = sync "/01_flan_phase"
+            flan_phase = val[0]
+            control flan, phase: flan_phase
+          end
+          live_loop :get_bc_mix do
+            val = sync "/01_bc_mix"
+            bc_mix = val[0]
+            control bc, mix: bc_mix
+          end
+          live_loop :get_bc_depth do
+            val = sync "/01_bc_depth"
+            bc_depth = val[0]
+            control bc, bits: bc_depth
+          end
+        end
+      end
+      
+      #Secondary Synth
+      with_fx :flanger, mix: flan_mix, mix_slide: 1, phase: flan_phase, phase_slide: 1 do |flan2|
+        with_fx :bitcrusher, mix: bc_mix, mix_slide: 1, bits: bc_depth, bits_slide: 1 do |bc2|
+          with_fx :ixi_techno, mix: ixi_mix, mix_slide: 1, phase: ixi_phase, phase_slide: 1 do |ixi2|
+            live_loop :play_secondary do
+              sync :heartbeat
+              tick
+              use_synth source2
+              use_synth_defaults amp: volume2*volume
+              with_transpose trans do
+              play [note0,:r,:r,:r,note1,:r,:r,:r,note2,:r,:r,:r,note3,:r,:r,:r,note4,:r,:r,:r,note5,:r,:r,:r,note6,:r,:r,:r,note7,:r,:r,:r].ring.look
+              end
+            end
+            #FX
+            live_loop :get_ixi2_phase do
+              val = sync "/01_ixi2_phase"
+              ixi2_phase = val[0]
+              control ixi2, phase: ixi2_phase
+            end
+            
+            live_loop :get_flan2_phase do
+              val = sync "/01_flan2_phase"
+              flan2_phase = val[0]
+              control flan2, phase: flan2_phase
+            end
+            
+            live_loop :get_bc2_depth do
+              val = sync "/01_bc2_depth"
+              bc2_depth = val[0]
+              control bc2, bits: bc2_depth
+            end
+          end
+        end
+      end
+    end
+  end
+end
+
+
