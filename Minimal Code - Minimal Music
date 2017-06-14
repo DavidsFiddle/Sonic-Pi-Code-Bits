@@ -1,0 +1,28 @@
+#Minimal Music with Minimal Code
+#by Davids Fiddle
+
+use_synth :piano
+live_loop :a do
+  play (chord :c3,:minor7, num_octaves: 2).pick(12), pan: 0.3
+  sleep 0.5
+end
+live_loop :b do
+  play (chord :c4,:minor, num_octaves: 2).pick(12), pan: -0.3
+  sleep 0.5
+end
+with_fx :reverb do
+  live_loop :c do
+    play (chord :c2, :minor7).pick(8), amp: 1.3
+    sleep 0.75
+  end
+  live_loop :d do
+    play (chord :c5, :m6, num_octaves: 2).pick(24), amp: 0.8
+    sleep 0.25
+  end
+  use_synth :hollow
+  live_loop :e do
+    play (ring :c2,:g2,:eb2,:c2,:f2,:c2,:g2,:c2).tick,
+      sustain: 3, amp: 1.5
+    sleep 3
+  end
+end
