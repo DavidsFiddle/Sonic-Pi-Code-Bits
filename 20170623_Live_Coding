@@ -1,0 +1,43 @@
+#23.06.2017 Live Coding
+#by Davids Fiddle
+
+use_bpm 120
+
+live_loop :robot do
+  tick
+  use_synth :fm
+  use_synth_defaults divisor: (ring 2,3,4,5).mirror.choose,
+    depth: 15, sustain: 0, release: 0.25,
+    amp: 0, pan: (ring 0.2,0.1,0,-0.2,-0.1).choose
+  play :c6
+  sleep 0.25
+end
+
+live_loop :drone do
+  use_synth :blade
+  play (chord :c2, :minor7, num_octaves: 2).choose,
+    sustain: 2, release: 3, attack: 0.25, amp: 0
+  sleep 4
+end
+
+live_loop :hb do
+  sync :robot
+  sample :bd_ada, amp: 0
+  sleep 1
+end
+
+live_loop :beet do
+  sync :hb
+  #sample :elec_chime, rate: (knit 1,5,1.5,1,2,3).choose
+  sleep 0.5
+  sample :drum_cymbal_closed
+  sleep 0.5
+end
+
+live_loop :machine do
+  #with_fx :bitcrusher, bits: 4 do
+  sample :ambi_haunted_hum,
+    rate: 0.25, amp: 0
+  sleep 7
+  #end
+end
