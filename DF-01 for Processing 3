@@ -1,5 +1,6 @@
 //DF-01 Bass
 //Coded by Davids Fiddle
+//Inspired by Mehackit
 //v0.9
 
 import oscP5.*;                   //Needs oscP5 and controlP5 libraries
