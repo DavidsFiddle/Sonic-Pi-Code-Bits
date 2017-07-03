@@ -1,0 +1,57 @@
+#Voice
+uncomment do
+  with_fx :reverb do
+    live_loop :input0 do
+        synth :sound_in, sustain: 0.75, attack: 0.25, release: 0.25
+      sleep 1
+    end
+  end
+end
+
+#Simple Organ
+comment do
+  with_fx :reverb do
+    with_fx :octaver do
+      live_loop :input0 do
+        synth :sound_in, sustain: 0.75, attack: 0.25, release: 0.25
+        sleep 1
+      end
+    end
+  end
+end
+
+#Organ2
+comment do
+  with_fx :gverb do
+    with_fx :octaver do
+      live_loop :input0 do
+        synth :sound_in, sustain: 0.75, attack: 0.25, release: 0.25
+        sleep 1
+      end
+    end
+  end
+end
+
+#Agressive Organ
+comment do
+  with_fx :krush do
+    with_fx :octaver do
+      live_loop :input0 do
+        synth :sound_in, sustain: 0.75, attack: 0.25, release: 0.25
+        sleep 1
+      end
+    end
+  end
+end
+
+#Growling Bass
+comment do
+  with_fx :pitch_shift, pitch: -12 do
+    with_fx :octaver do
+      live_loop :input0 do
+        synth :sound_in, sustain: 0.75, attack: 0.25, release: 0.25
+        sleep 1
+      end
+    end
+  end
+end
