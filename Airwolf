@@ -1,0 +1,161 @@
+#Airwolf Theme
+#Coded by Davids Fiddle
+
+use_bpm 103
+
+h = 2
+dq = 1.5
+q = 1
+de = 0.75
+e = 0.5
+ds = 0.375
+s = 0.25
+
+#Arp
+in_thread do
+  use_synth :pulse
+  use_synth_defaults amp: 0.6, attack: 0, sustain: 0.15, release: 0.2
+  10.times do
+    play_pattern_timed [:a3,:c4,:e4,:a4,:c5,:g4,:a4,:e4,:g4,:e4,:g4,:a4], [s,s,s,s,s,s,s,s,s,s,s,s]
+  end
+  6.times do
+    with_transpose 3 do
+      play_pattern_timed [:a3,:c4,:e4,:a4,:c5,:g4,:a4,:e4,:g4,:e4,:g4,:a4], [s,s,s,s,s,s,s,s,s,s,s,s]
+    end
+  end
+  6.times do
+    play_pattern_timed [:a3,:c4,:e4,:a4,:c5,:g4,:a4,:e4,:g4,:e4,:g4,:a4], [s,s,s,s,s,s,s,s,s,s,s,s]
+  end
+  6.times do
+    with_transpose 3 do
+      play_pattern_timed [:a3,:c4,:e4,:a4,:c5,:g4,:a4,:e4,:g4,:e4,:g4,:a4], [s,s,s,s,s,s,s,s,s,s,s,s]
+    end
+  end
+  6.times do
+    play_pattern_timed [:a3,:c4,:e4,:a4,:c5,:g4,:a4,:e4,:g4,:e4,:g4,:a4], [s,s,s,s,s,s,s,s,s,s,s,s]
+  end
+end
+
+#Beat
+in_thread do
+  10.times do
+    4.times do
+      sample :bd_haus
+      sleep 0.75
+    end
+  end
+  4.times do
+    6.times do
+      4.times do
+        sample :bd_haus
+        sleep 0.75
+      end
+    end
+  end
+end
+
+#Bass
+in_thread do
+  with_fx :reverb do
+    with_fx :lpf do
+      use_synth :pluck
+      use_synth_defaults amp: 1.2
+      sleep 6
+      8.times do
+        12.times do
+          play :a2
+          sleep s
+        end
+      end
+      6.times do
+        with_transpose 3 do
+          12.times do
+            play :a2
+            sleep s
+          end
+        end
+      end
+      6.times do
+        12.times do
+          play :a2
+          sleep s
+        end
+      end
+      6.times do
+        with_transpose 3 do
+          12.times do
+            play :a2
+            sleep s
+          end
+        end
+      end
+      6.times do
+        12.times do
+          play :a2
+          sleep s
+        end
+      end
+    end
+  end
+end
+
+with_fx :hpf do
+  #Melody
+  in_thread do
+    with_fx :compressor do
+      use_synth :saw
+      use_synth_defaults amp: 1.5, pan: 0.2
+      sleep 12
+      2.times do
+        2.times do
+          play_pattern_timed [:a4,:c5,:e5,:g5,:a5,:c6,:b5,:g5,:a5,:c6,:b5,:g5,:a5,:g5,:b5,:e5,:d5,:c5,:d5,:b4],
+            [de,s,s,s,de,s,s,s,de,s,s,s,de,e,s,de,de,e,s,de]
+        end
+        with_transpose 3 do
+          play_pattern_timed [:a4,:c5,:e5,:g5,:a5,:c6,:b5,:g5,:a5,:c6,:b5,:g5,:a5,:g5,:b5,:e5,:d5,:c5,:d5,:b4],
+            [de,s,s,s,de,s,s,s,de,s,s,s,de,e,s,de,de,e,s,de]
+          play_pattern_timed [:a4,:c5,:e5,:g5,:a5,:c6,:b5,:g5,:a5,:c6,:b5,:g5,:a5,:c6,:e6,:g6,:a6,:r],
+            [de,s,s,s,de,s,s,s,de,s,s,s,de,s,s,s,h,q]
+        end
+      end
+    end
+  end
+  #Melody double
+  in_thread do
+    with_fx :compressor do
+      with_transpose -12 do
+        use_synth :saw
+        use_synth_defaults amp: 1.3, pan: -0.2
+        sleep 12
+        2.times do
+          2.times do
+            play_pattern_timed [:a4,:c5,:e5,:g5,:a5,:c6,:b5,:g5,:a5,:c6,:b5,:g5,:a5,:g5,:b5,:e5,:d5,:c5,:d5,:b4],
+              [de,s,s,s,de,s,s,s,de,s,s,s,de,e,s,de,de,e,s,de]
+          end
+          with_transpose 3 do
+            play_pattern_timed [:a4,:c5,:e5,:g5,:a5,:c6,:b5,:g5,:a5,:c6,:b5,:g5,:a5,:g5,:b5,:e5,:d5,:c5,:d5,:b4],
+              [de,s,s,s,de,s,s,s,de,s,s,s,de,e,s,de,de,e,s,de]
+            play_pattern_timed [:a4,:c5,:e5,:g5,:a5,:c6,:b5,:g5,:a5,:c6,:b5,:g5,:a5,:c6,:e6,:g6,:a6,:r],
+              [de,s,s,s,de,s,s,s,de,s,s,s,de,s,s,s,h,q]
+          end
+        end
+      end
+    end
+  end
+end
+
+#Pad
+in_thread do
+  with_fx :panslicer, smooth: 3, phase: 4, pan_min: -0.3, pan_max: 0.3 do
+    use_synth :fm
+    use_synth_defaults attack: 0.2, sustain: 18
+    sleep 12
+    sleep 18
+    2.times do
+      play :c4
+      sleep 18
+      play :a3
+      sleep 18
+    end
+  end
+end
