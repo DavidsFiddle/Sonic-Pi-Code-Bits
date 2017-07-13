@@ -1,0 +1,33 @@
+#Live Coding Session 13.07.2017
+#Coded by Davids Fiddle
+
+use_bpm 180
+
+live_loop :heart do
+  sample :bd_ada, amp: 0
+  sample :bd_klub, amp: 0
+  sleep 1
+end
+
+live_loop :machine do
+  sync :heart
+  sample :ambi_dark_woosh, rate: (ring 0.5, -0.5).choose,
+    amp: 1.2
+  sleep 4
+end
+
+sync :heart
+live_loop :thunder do
+  sample :ambi_choir, rate: 0.4, amp: 0.5
+  sleep 4
+end
+
+sync :heart
+live_loop :arp do
+  use_synth :dpulse
+  use_synth_defaults cutoff: 60, amp: 0
+  play (chord :gb2, '7+5', num_octaves: 3).tick
+  sleep 0.5
+  play (chord :gb2, '11', num_octaves: 3).tick
+  sleep 0.5
+end
