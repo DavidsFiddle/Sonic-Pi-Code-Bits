@@ -1,0 +1,152 @@
+#DF-03 Machine
+#Coded by Davids Fiddle
+#v1.0
+
+this_note = 60
+this_vol = 1
+this_bpm = 60
+att = 0
+dec = 0
+sus = 0
+rel = 1
+mode = 0
+this_synth = :beep
+
+
+use_bpm 60
+
+live_loop :get_note do
+  val = sync '/03_note'
+  this_note = val[0]
+end
+live_loop :get_vol do
+  val = sync '/03_vol'
+  this_vol = val[0]
+end
+live_loop :get_bpm do
+  val = sync '/03_bpm'
+  this_bpm = val[0]
+end
+live_loop :get_att do
+  val = sync '/03_att'
+  att = val[0]
+end
+live_loop :get_dec do
+  val = sync '/03_dec'
+  dec = val[0]
+end
+live_loop :get_sus do
+  val = sync '/03_sus'
+  sus = val[0]
+end
+live_loop :get_rel do
+  val = sync '/03_rel'
+  rel = val[0]
+end
+live_loop :get_mode do
+  val = sync '/03_mode'
+  mode = val[0]
+end
+live_loop :get_synth do
+  val = sync '/03_synth'
+  this_synth = :beep if val[0] == 0
+  this_synth = :pulse if val[0] == 1
+  this_synth = :blade if val[0] == 2
+  this_synth = :square if val[0] == 3
+  this_synth = :tri if val[0] == 4
+  this_synth = :saw if val[0] == 5
+  this_synth = :prophet if val[0] == 6
+  this_synth = :tb303 if val[0] == 7
+  this_synth = :noise if val[0] == 8
+  this_synth = :bnoise if val[0] == 9
+end
+live_loop :get_mode do
+  val = sync '/03_mode'
+  mode = val[0]
+end
+
+with_fx :reverb, mix: 0, mix_slide: 1, room: 0.6, room_slide: 1 do |re|
+  with_fx :ixi_techno, mix: 0, mix_slide: 1, phase: 8, phase_slide: 1, cutoff_max: 120, cutoff_max_slide: 1, cutoff_min: 60, cutoff_min_slide: 1 do |ix|
+    with_fx :bitcrusher, mix: 0, mix_slide: 1, bits: 16, bits_slide: 1 do |bc|
+      with_fx :octaver, mix: 0, mix_slide: 1 do |oc|
+        with_fx :ring_mod, mix: 0, mix_slide: 1, freq: 30, freq_slide: 2 do |rm|
+          live_loop :tick_tock do
+            sync :tick_tock2
+            cue :beat3
+            use_synth this_synth
+            use_synth_defaults sustain_level: 0.75, attack: att, decay: dec, sustain: sus, release: rel
+            with_bpm this_bpm do
+              play this_note, amp: this_vol if mode == 0
+              sleep 1
+            end
+          end
+          live_loop :tick_tock2 do
+            use_synth this_synth
+            use_synth_defaults sustain_level: 0.75, attack: att, decay: dec, sustain: sus, release: rel
+            with_bpm this_bpm do
+              play this_note, amp: this_vol if mode == 3
+              sleep 0.5
+            end
+          end
+          live_loop :radom do
+            use_synth this_synth
+            use_synth_defaults sustain_level: 0.75, attack: att, decay: dec, sustain: sus, release: rel
+            with_bpm this_bpm do
+              play this_note, amp: this_vol if mode == 2
+              sleep (range 0.2,2,0.2).choose
+            end
+          end
+          live_loop :manual do
+            sync '/03_manu'
+            use_synth this_synth
+            play this_note, amp: this_vol
+          end
+          live_loop :get_oc_mix do
+            val = sync '/03_oc_mix'
+            control oc, mix: val[0]
+          end
+          live_loop :get_rm_mix do
+            val = sync '/03_rm_mix'
+            control rm, mix: val[0]
+          end
+          live_loop :get_rm_freq do
+            val = sync '/03_rm_freq'
+            control rm, freq: val[0]
+          end
+          live_loop :get_bc_mix do
+            val = sync '/03_bc_mix'
+            control bc, mix: val[0]
+          end
+          live_loop :get_bc_bits do
+            val = sync '/03_bc_bits'
+            control bc, bits: val[0]
+          end
+          live_loop :get_ix_mix do
+            val = sync '/03_ix_mix'
+            control ix, mix: val[0]
+          end
+          live_loop :get_ix_phase do
+            val = sync '/03_ix_phase'
+            control ix, phase: val[0]
+          end
+          live_loop :get_ix_min do
+            val = sync '/03_ix_min'
+            control ix, cutoff_min: val[0]
+          end
+          live_loop :get_ix_max do
+            val = sync '/03_ix_max'
+            control ix, cutoff_max: val[0]
+          end
+          live_loop :get_re_mix do
+            val = sync '/03_re_mix'
+            control re, mix: val[0]
+          end
+          live_loop :get_re_room do
+            val = sync '/03_re_room'
+            control re, room: val[0]
+          end
+        end
+      end
+    end
+  end
+end
