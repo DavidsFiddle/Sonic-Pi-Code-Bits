@@ -1,0 +1,245 @@
+//DF-03 Machine
+//Coded by Davids Fiddle
+//v1.0
+
+import oscP5.*;                   //Needs oscP5 and controlP5 libraries
+import netP5.*;                   
+import controlP5.*;
+
+OscP5 oscP5;                      //Communication
+NetAddress sonicPi;               //where the messages go
+ControlP5 cp5;                    //Interface
+
+boolean enableComms = true;
+
+PFont pfont12, pfont15, pfont20;
+
+void setup() {
+
+  size(700, 600, P3D);  //set up window
+  smooth();    
+  //Network adress to communicate with Sonic Pi
+  oscP5 = new OscP5(this, 8000);                  
+  sonicPi = new NetAddress("127.0.0.1", 4559);
+  //Creating Fonts
+  pfont20 = createFont("Georgia", 20, true);
+  pfont15 = createFont("Georgia", 15, true);
+  pfont12 = createFont("Georgia", 12, true);
+
+  createUI();                              
+  enableComms = true;
+}
+
+//Methods for sending key/value to Sonic Pi
+void sendOsc(String name, int value) {
+  OscMessage toSend = new OscMessage("/" + name);
+  toSend.add((int)value);
+  oscP5.send(toSend, sonicPi);
+}
+void sendOsc(String name, float value) {
+  OscMessage toSend = new OscMessage("/" + name);
+  toSend.add((float)value);
+  oscP5.send(toSend, sonicPi);
+}
+
+//fill in the Background
+void draw() {
+  background(30);
+  drawBackground();
+}
+
+//Draw all lines
+void drawBackground() {
+  fill(0);
+
+  stroke(255);
+  line(0, 100, 700, 100);
+  line(500, 0, 500, 100);
+  line(300, 0, 300, 100);
+  line(100, 100, 100, 600);
+  line(200, 100, 200, 600);
+  line(200, 500, 500, 500);
+  line(400, 500, 400, 600);
+  line(500, 500, 500, 600);
+  stroke(100);
+  fill(10);
+  ellipse(350, 400, 155, 155);
+  fill(50);
+  ellipse(350, 400, 150, 150);
+  fill(50, 40, 40);
+  ellipse(350, 400, 125, 125);
+  fill(100, 30, 30);
+  ellipse(350, 400, 100, 100);
+  fill(150, 20, 20);
+  ellipse(350, 400, 75, 75);
+  fill(200, 0, 0);
+  ellipse(350, 400, 50, 50);
+}
+
+void keyPressed() {
+  Toggle t = null;
+  if (key == '1') {
+    manual();
+  }
+}
+
+void createUI() {
+  //Initialising Fonts
+  ControlFont fontl = new ControlFont(pfont20);
+  ControlFont fontm = new ControlFont(pfont15);
+  ControlFont fonts = new ControlFont(pfont12);
+
+  //create canvas for the controls
+  cp5 = new ControlP5(this);
+
+  //Labels
+  cp5.addTextlabel("title").setText("DF-03 Machine \nby Davids Fiddle").setPosition(25, 25).setFont(fontl);
+  cp5.addTextlabel("thanks").setText("Running with Sonic Pi\nby Sam Aaron\nand Processing 3\nby Ben Fry and Casey Reas").setPosition(525, 25).setFont(fonts);
+  cp5.addTextlabel("Version").setText("v1.0").setPosition(250, 75).setFont(fonts);
+
+  cp5.addKnob("vol").setRange(0, 2.0).setValue(1.0).setPosition(325, 25).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Volume").setDecimalPrecision(1).setFont(fonts);
+  cp5.addKnob("bpm").setRange(6, 240).setValue(60).setPosition(425, 25).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("BPM").setDecimalPrecision(1).setFont(fonts);
+
+  cp5.addKnob("note").setRange(24, 120).setValue(60).setPosition(25, 125).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Note").setDecimalPrecision(1).setFont(fonts);
+  cp5.addKnob("att").setRange(0, 1).setValue(0).setPosition(25, 225).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Attack").setDecimalPrecision(1).setFont(fonts);
+  cp5.addKnob("dec").setRange(0, 1).setValue(0).setPosition(25, 325).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Decay").setDecimalPrecision(1).setFont(fonts);
+  cp5.addKnob("sus").setRange(0, 2).setValue(0).setPosition(25, 425).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Sustain").setDecimalPrecision(1).setFont(fonts);
+  cp5.addKnob("rel").setRange(0, 4).setValue(1).setPosition(25, 525).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Release").setDecimalPrecision(1).setFont(fonts);
+
+  cp5.addRadioButton("mode").setPosition(200, 500).setItemsPerRow(2).setItemWidth(99).setItemHeight(50)
+    .addItem("BPM", 0).addItem("Manual", 1).addItem("Random", 2).addItem("BPM * 2", 3).align(CENTER, CENTER).activate(0).setNoneSelectedAllowed(false);
+  cp5.addButton("manual").setPosition(400, 500).setSize(99, 99).setLabel("HIT / '1'").setFont(fontm);
+
+  cp5.addRadioButton("synth").setPosition(100, 100).setItemsPerRow(1).setItemWidth(99).setItemHeight(49).addItem("Beep", 0).addItem("Pulse", 1).addItem("Blade", 2).addItem("Square", 3).addItem("Tri", 4).addItem("Saw", 5).addItem("Prophet", 6).addItem("Tb-303", 7).addItem("Noise", 8).addItem("B-Noise", 9).align(CENTER, CENTER).activate(0).setNoneSelectedAllowed(false);
+
+  cp5.addKnob("oc_mix").setRange(0, 1).setValue(0).setPosition(325, 125).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Octaver").setDecimalPrecision(2).setFont(fonts);
+  cp5.addKnob("rm_mix").setRange(0, 1).setValue(0).setPosition(225, 125).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Ring Mod").setDecimalPrecision(2).setFont(fonts);
+  cp5.addKnob("rm_freq").setRange(12, 120).setValue(30).setPosition(225, 225).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Carrier").setDecimalPrecision(1).setFont(fonts);
+  cp5.addKnob("bc_mix").setRange(0, 1).setValue(0).setPosition(425, 125).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Bit Crusher").setDecimalPrecision(2).setFont(fonts);
+  cp5.addKnob("bc_bits").setRange(1, 16).setValue(16).setPosition(425, 225).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Bits").setDecimalPrecision(1).setFont(fonts);
+  cp5.addKnob("ix_mix").setRange(0, 1).setValue(0).setPosition(525, 125).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Filter Sweep").setDecimalPrecision(2).setFont(fonts);
+  cp5.addKnob("ix_phase").setRange(1, 16).setValue(8).setPosition(525, 225).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Phase").setDecimalPrecision(2).setFont(fonts);
+  cp5.addKnob("ix_min").setRange(2, 129).setValue(60).setPosition(525, 325).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Low End").setDecimalPrecision(2).setFont(fonts);
+  cp5.addKnob("ix_max").setRange(2, 129).setValue(120).setPosition(525, 425).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("High End").setDecimalPrecision(2).setFont(fonts);
+  cp5.addKnob("re_mix").setRange(0, 0.9).setValue(0).setPosition(625, 125).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Reverb").setDecimalPrecision(2).setFont(fonts);
+  cp5.addKnob("re_room").setRange(0, 1).setValue(0.6).setPosition(625, 225).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Room").setDecimalPrecision(2).setFont(fonts);
+
+  /*
+  //Speed control
+   cp5.addKnob("speed").setRange(50, 220).setValue(90).setPosition(25, 25).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Speed").setDecimalPrecision(0).setFont(fonts);
+   
+   //Global reverb
+   cp5.addKnob("verbMix").setRange(0, 1).setValue(0).setPosition(125, 25).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Reverb").setDecimalPrecision(2).setFont(fonts);
+   cp5.addKnob("verbRoom").setRange(0, 1).setValue(0.6).setPosition(225, 25).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Room").setDecimalPrecision(2).setFont(fonts);
+   
+   //Volume knobs
+   cp5.addKnob("volHihat").setRange(0, 2.0).setValue(1.0).setPosition(25, 225).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Hihat").setDecimalPrecision(1).setFont(fonts);
+   cp5.addKnob("volSnare").setRange(0, 2.0).setValue(1.0).setPosition(25, 325).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Snare").setDecimalPrecision(1).setFont(fonts);
+   cp5.addKnob("volToms").setRange(0, 2.0).setValue(1.0).setPosition(25, 425).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Toms").setDecimalPrecision(1).setFont(fonts);
+   cp5.addKnob("volMisc").setRange(0, 2.0).setValue(1.0).setPosition(25, 525).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Misc").setDecimalPrecision(1).setFont(fonts);
+   
+   //Sample selectors
+   cp5.addRadioButton("kikSample").setPosition(850, 125).setItemsPerRow(2).setItemWidth(75).setItemHeight(25)
+   .addItem("Acoustic", 0).addItem("Ada", 1).addItem("Haus", 2).addItem("Sone", 3).align(CENTER, CENTER)
+   .activate(0).setNoneSelectedAllowed(false);
+   
+   cp5.addRadioButton("hihatSample1").setPosition(850, 225).setItemsPerRow(2).setItemWidth(75).setItemHeight(25)
+   .addItem("Pedal", 0).addItem("Closed", 1).align(CENTER, CENTER)
+   .activate(0).setNoneSelectedAllowed(false);
+   cp5.addRadioButton("hihatSample2").setPosition(850, 250).setItemsPerRow(2).setItemWidth(75).setItemHeight(25)
+   .addItem("Closed ", 0).addItem("Open", 1).align(CENTER, CENTER)
+   .activate(0).setNoneSelectedAllowed(false);
+   
+   cp5.addRadioButton("snareSample").setPosition(850, 325).setItemsPerRow(2).setItemWidth(75).setItemHeight(25)
+   .addItem("Snare", 0).addItem("Dub", 1).addItem("Dolf", 2).addItem("Zome", 3).align(CENTER, CENTER)
+   .activate(0).setNoneSelectedAllowed(false);
+   
+   //Pattern selectors
+   cp5.addRadioButton("kikPattern").setPosition(125, 125).setItemsPerRow(8).setItemWidth(100).setItemHeight(50)
+   .addItem("kik Off", 0).addItem("kik 1", 1).addItem("kik 2", 2).addItem("kik 3", 3).addItem("kik 4", 4).addItem("kik 5", 5).addItem("kik 6", 6).align(CENTER, CENTER)
+   .activate(0).setNoneSelectedAllowed(false);
+   
+   cp5.addRadioButton("hihatPattern").setPosition(125, 225).setItemsPerRow(8).setItemWidth(100).setItemHeight(50)
+   .addItem("hihat Off", 0).addItem("hihat 1", 1).addItem("hihat 2", 2).addItem("hihat 3", 3).addItem("hihat 4", 4).addItem("hihat 5", 5).addItem("hihat 6", 6).align(CENTER, CENTER)
+   .activate(0).setNoneSelectedAllowed(false);
+   
+   cp5.addRadioButton("snarePattern").setPosition(125, 325).setItemsPerRow(8).setItemWidth(100).setItemHeight(50)
+   .addItem("snare Off", 0).addItem("snare 1", 1).addItem("snare 2", 2).addItem("snare 3", 3).addItem("snare 4", 4).addItem("snare 5", 5).addItem("snare 6", 6).align(CENTER, CENTER)
+   .activate(0).setNoneSelectedAllowed(false);
+   
+   cp5.addRadioButton("tomPattern").setPosition(125, 425).setItemsPerRow(8).setItemWidth(100).setItemHeight(50)
+   .addItem("tom Off", 0).addItem("tom 1", 1).addItem("tom 2", 2).addItem("tom 3", 3).addItem("tom 4", 4).addItem("tom 5", 5).addItem("tom 6", 6).addItem("tom 7", 7).align(CENTER, CENTER)
+   .activate(0).setNoneSelectedAllowed(false);
+   
+   cp5.addRadioButton("miscPattern").setPosition(125, 525).setItemsPerRow(8).setItemWidth(100).setItemHeight(50)
+   .addItem("misc Off", 0).addItem("misc 1", 1).addItem("misc 2", 2).addItem("misc 3", 3).addItem("misc 4", 4).addItem("misc 5", 5).addItem("misc 6", 6).addItem("misc 7", 7).align(CENTER, CENTER)
+   .activate(0).setNoneSelectedAllowed(false);
+   */
+}
+
+
+//Sending osc-messages
+
+void vol (float Value) {
+  sendOsc("03_vol", Value);
+}
+void note (int Value) {
+  sendOsc("03_note", Value);
+}
+void bpm (int Value) {
+  sendOsc("03_bpm", Value);
+}
+void oc_mix (float Value) {
+  sendOsc ("03_oc_mix", Value);
+}
+void rm_mix (float Value) {
+  sendOsc ("03_rm_mix", Value);
+}
+void rm_freq (float Value) {
+  sendOsc ("03_rm_freq", Value);
+}
+void att (float Value) {
+  sendOsc ("03_att", Value);
+}
+void dec (float Value) {
+  sendOsc ("03_dec", Value);
+}
+void sus (float Value) {
+  sendOsc ("03_sus", Value);
+}
+void rel (float Value) {
+  sendOsc ("03_rel", Value);
+}
+void mode (int Value) {
+  sendOsc("03_mode", Value);
+}
+void manual () {
+  sendOsc ("03_manu", 0);
+}
+void synth (int Value) {
+  sendOsc ("03_synth", Value);
+}
+void bc_mix (float Value) {
+  sendOsc ("03_bc_mix", Value);
+}
+void bc_bits (int Value) {
+  sendOsc ("03_bc_bits", Value);
+}
+void ix_mix (float Value) {
+  sendOsc("03_ix_mix", Value);
+}
+void ix_phase (float Value) {
+  sendOsc("03_ix_phase", Value);
+}
+void ix_min (int Value) {
+  sendOsc("03_ix_min", Value);
+}
+void ix_max (int Value) {
+  sendOsc("03_ix_max", Value);
+}
+void re_mix (float Value) {
+  sendOsc("03_re_mix", Value);
+}
+void re_room (float Value) {
+  sendOsc("03_re_room", Value);
+}
