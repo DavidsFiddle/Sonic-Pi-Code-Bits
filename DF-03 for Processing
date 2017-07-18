@@ -1,6 +1,6 @@
 //DF-03 Machine
 //Coded by Davids Fiddle
-//v1.0
+//v1.1
 
 import oscP5.*;                   //Needs oscP5 and controlP5 libraries
 import netP5.*;                   
@@ -51,7 +51,7 @@ void draw() {
 //Draw all lines
 void drawBackground() {
   fill(0);
-
+  //General Structure
   stroke(255);
   line(0, 100, 700, 100);
   line(500, 0, 500, 100);
@@ -61,6 +61,7 @@ void drawBackground() {
   line(200, 500, 500, 500);
   line(400, 500, 400, 600);
   line(500, 500, 500, 600);
+  //HALs Eye
   stroke(100);
   fill(10);
   ellipse(350, 400, 155, 155);
@@ -96,22 +97,22 @@ void createUI() {
   cp5.addTextlabel("title").setText("DF-03 Machine \nby Davids Fiddle").setPosition(25, 25).setFont(fontl);
   cp5.addTextlabel("thanks").setText("Running with Sonic Pi\nby Sam Aaron\nand Processing 3\nby Ben Fry and Casey Reas").setPosition(525, 25).setFont(fonts);
   cp5.addTextlabel("Version").setText("v1.0").setPosition(250, 75).setFont(fonts);
-
+  //General Controls
   cp5.addKnob("vol").setRange(0, 2.0).setValue(1.0).setPosition(325, 25).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Volume").setDecimalPrecision(1).setFont(fonts);
   cp5.addKnob("bpm").setRange(6, 240).setValue(60).setPosition(425, 25).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("BPM").setDecimalPrecision(1).setFont(fonts);
-
+  //ADSR and Pitch
   cp5.addKnob("note").setRange(24, 120).setValue(60).setPosition(25, 125).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Note").setDecimalPrecision(1).setFont(fonts);
   cp5.addKnob("att").setRange(0, 1).setValue(0).setPosition(25, 225).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Attack").setDecimalPrecision(1).setFont(fonts);
   cp5.addKnob("dec").setRange(0, 1).setValue(0).setPosition(25, 325).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Decay").setDecimalPrecision(1).setFont(fonts);
   cp5.addKnob("sus").setRange(0, 2).setValue(0).setPosition(25, 425).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Sustain").setDecimalPrecision(1).setFont(fonts);
   cp5.addKnob("rel").setRange(0, 4).setValue(1).setPosition(25, 525).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Release").setDecimalPrecision(1).setFont(fonts);
-
+  //Trigger Mode
   cp5.addRadioButton("mode").setPosition(200, 500).setItemsPerRow(2).setItemWidth(99).setItemHeight(50)
     .addItem("BPM", 0).addItem("Manual", 1).addItem("Random", 2).addItem("BPM * 2", 3).align(CENTER, CENTER).activate(0).setNoneSelectedAllowed(false);
   cp5.addButton("manual").setPosition(400, 500).setSize(99, 99).setLabel("HIT / '1'").setFont(fontm);
-
+  //Source Synth
   cp5.addRadioButton("synth").setPosition(100, 100).setItemsPerRow(1).setItemWidth(99).setItemHeight(49).addItem("Beep", 0).addItem("Pulse", 1).addItem("Blade", 2).addItem("Square", 3).addItem("Tri", 4).addItem("Saw", 5).addItem("Prophet", 6).addItem("Tb-303", 7).addItem("Noise", 8).addItem("B-Noise", 9).align(CENTER, CENTER).activate(0).setNoneSelectedAllowed(false);
-
+  //FX Controls
   cp5.addKnob("oc_mix").setRange(0, 1).setValue(0).setPosition(325, 125).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Octaver").setDecimalPrecision(2).setFont(fonts);
   cp5.addKnob("rm_mix").setRange(0, 1).setValue(0).setPosition(225, 125).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Ring Mod").setDecimalPrecision(2).setFont(fonts);
   cp5.addKnob("rm_freq").setRange(12, 120).setValue(30).setPosition(225, 225).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Carrier").setDecimalPrecision(1).setFont(fonts);
@@ -121,9 +122,8 @@ void createUI() {
   cp5.addKnob("ix_phase").setRange(1, 16).setValue(8).setPosition(525, 225).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Phase").setDecimalPrecision(2).setFont(fonts);
   cp5.addKnob("ix_min").setRange(2, 129).setValue(60).setPosition(525, 325).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Low End").setDecimalPrecision(2).setFont(fonts);
   cp5.addKnob("ix_max").setRange(2, 129).setValue(120).setPosition(525, 425).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("High End").setDecimalPrecision(2).setFont(fonts);
-  cp5.addKnob("re_mix").setRange(0, 0.9).setValue(0).setPosition(625, 125).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Reverb").setDecimalPrecision(2).setFont(fonts);
+  cp5.addKnob("re_mix").setRange(0, 1).setValue(0).setPosition(625, 125).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Reverb").setDecimalPrecision(2).setFont(fonts);
   cp5.addKnob("re_room").setRange(0, 1).setValue(0.6).setPosition(625, 225).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Room").setDecimalPrecision(2).setFont(fonts);
-
 }
 
 
