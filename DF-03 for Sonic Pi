@@ -1,6 +1,6 @@
 #DF-03 Machine
 #Coded by Davids Fiddle
-#v1.0
+#v1.1
 
 this_note = 60
 this_vol = 1
@@ -11,10 +11,9 @@ sus = 0
 rel = 1
 mode = 0
 this_synth = :beep
-
-
 use_bpm 60
 
+#Love_loops to receive the ADSR, volume, mode and source values
 live_loop :get_note do
   val = sync '/03_note'
   this_note = val[0]
@@ -70,6 +69,8 @@ with_fx :reverb, mix: 0, mix_slide: 1, room: 0.6, room_slide: 1 do |re|
     with_fx :bitcrusher, mix: 0, mix_slide: 1, bits: 16, bits_slide: 1 do |bc|
       with_fx :octaver, mix: 0, mix_slide: 1 do |oc|
         with_fx :ring_mod, mix: 0, mix_slide: 1, freq: 30, freq_slide: 2 do |rm|
+          #Live_loops for the sources:
+          #BPM:
           live_loop :tick_tock do
             sync :tick_tock2
             cue :beat3
@@ -80,6 +81,7 @@ with_fx :reverb, mix: 0, mix_slide: 1, room: 0.6, room_slide: 1 do |re|
               sleep 1
             end
           end
+          #2*BPM
           live_loop :tick_tock2 do
             use_synth this_synth
             use_synth_defaults sustain_level: 0.75, attack: att, decay: dec, sustain: sus, release: rel
@@ -88,6 +90,7 @@ with_fx :reverb, mix: 0, mix_slide: 1, room: 0.6, room_slide: 1 do |re|
               sleep 0.5
             end
           end
+          #Random
           live_loop :radom do
             use_synth this_synth
             use_synth_defaults sustain_level: 0.75, attack: att, decay: dec, sustain: sus, release: rel
@@ -96,18 +99,20 @@ with_fx :reverb, mix: 0, mix_slide: 1, room: 0.6, room_slide: 1 do |re|
               sleep (range 0.2,2,0.2).choose
             end
           end
+          #Manual
           live_loop :manual do
             sync '/03_manu'
             use_synth this_synth
             play this_note, amp: this_vol
           end
+          #Live_loops for recieving the Osc messages
           live_loop :get_oc_mix do
             val = sync '/03_oc_mix'
-            control oc, mix: val[0]
+            control oc, mix: val[0] if val[0] <= 1
           end
           live_loop :get_rm_mix do
             val = sync '/03_rm_mix'
-            control rm, mix: val[0]
+            control rm, mix: val[0] if val[0] <= 1
           end
           live_loop :get_rm_freq do
             val = sync '/03_rm_freq'
@@ -115,7 +120,7 @@ with_fx :reverb, mix: 0, mix_slide: 1, room: 0.6, room_slide: 1 do |re|
           end
           live_loop :get_bc_mix do
             val = sync '/03_bc_mix'
-            control bc, mix: val[0]
+            control bc, mix: val[0] if val[0] <= 1
           end
           live_loop :get_bc_bits do
             val = sync '/03_bc_bits'
@@ -123,7 +128,7 @@ with_fx :reverb, mix: 0, mix_slide: 1, room: 0.6, room_slide: 1 do |re|
           end
           live_loop :get_ix_mix do
             val = sync '/03_ix_mix'
-            control ix, mix: val[0]
+            control ix, mix: val[0] if val[0] <= 1
           end
           live_loop :get_ix_phase do
             val = sync '/03_ix_phase'
@@ -139,7 +144,7 @@ with_fx :reverb, mix: 0, mix_slide: 1, room: 0.6, room_slide: 1 do |re|
           end
           live_loop :get_re_mix do
             val = sync '/03_re_mix'
-            control re, mix: val[0]
+            control re, mix: val[0] if val[0] <= 1
           end
           live_loop :get_re_room do
             val = sync '/03_re_room'
