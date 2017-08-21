@@ -1,0 +1,47 @@
+#Live Coding Session 18.07.2017
+#Coded by Davids Fiddle
+
+use_random_seed 3000
+use_bpm 100
+
+live_loop :bass do
+  use_synth :subpulse
+  use_synth_defaults sustain: 1.5, 
+    release: 0.75, amp: 1
+  play (ring :d3, :a2, :bb2, :c3).tick
+  sleep 2
+end
+
+sync :bass
+live_loop :pad do
+  use_synth :fm
+  use_synth_defaults sustain: 2, release: 0.5
+  play (ring :d3, :a2, :bb2, :c3).tick, amp: 1.5
+  sleep 2
+end
+
+with_fx :echo do
+  live_loop :kik do
+    sample :drum_bass_hard
+    sleep 2
+  end
+end
+
+sync :kik
+with_fx :reverb do
+  live_loop :melody do
+    use_synth :chiplead
+    play (scale :d3, :minor, num_octaves: 2).choose
+    sleep (knit 0.25,2,0.5,5,0.75,2,1,4,1.5,1)
+  end
+end
+
+sync :kik
+with_fx :reverb do
+  live_loop :melody2 do
+    use_synth :chiplead
+    use_synth_defaults amp: 0.5
+    play (scale :d3, :minor_pentatonic, num_octaves: 2).choose
+    sleep (knit 0.5,5,1,4,1.5,1)
+  end
+end
