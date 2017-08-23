@@ -1,263 +1,212 @@
-//DF-01 Bass
-//Coded by Davids Fiddle
-//Inspired by Mehackit
-//v0.9
+#DF-01 Arpeggigator
+#Coded by Davids Fiddle
 
-import oscP5.*;                   //Needs oscP5 and controlP5 libraries
-import netP5.*;                   
-import controlP5.*;
+do_sync = :e
+live_loop :get_sync do
+  val = sync '/01_sync'
+  do_sync = :h if val[0] == 0
+  do_sync = :q if val[0] == 1
+  do_sync = :e if val[0] == 2
+  do_sync = :s if val[0] == 3
+end
+mode = 1
+live_loop :get_mode do
+  val = sync '/01_mode'
+  mode = val[0]
+end
+root = :c3
+live_loop :get_root do
+  val = sync '/01_root'
+  root = val[0]
+end
+type = :major
+live_loop :get_type do
+  val = sync '/01_type'
+  type = :major if val[0] == 0
+  type = :minor if val[0] == 1
+  type = :augmented if val[0] == 2
+  type = :diminished if val[0] == 3
+  type = :major7 if val[0] == 4
+  type = :minor7 if val[0] == 5
+  type = :sus2 if val[0] == 6
+  type = :sus4 if val[0] == 7
+end
+length = 8
+live_loop :get_length do
+  val = sync '/01_length'
+  length = 8 if val[0] == 0
+  length = 16 if val[0] == 1
+end
+n0 = 60
+n1 = 60
+n2 = 60
+n3 = 60
+n4 = 60
+n5 = 60
+n6 = 60
+n7 = 60
+n8 = 60
+n9 = 60
+n10 = 60
+n11 = 60
+n12 = 60
+n13 = 60
+n14 = 60
+n15 = 60
+live_loop :get_n0 do
+  val = sync '/01_n0'
+  n0 = val[0]
+end
+live_loop :get_n1 do
+  val = sync '/01_n1'
+  n1 = val[0]
+end
+live_loop :get_n2 do
+  val = sync '/01_n2'
+  n2 = val[0]
+end
+live_loop :get_n3 do
+  val = sync '/01_n3'
+  n3 = val[0]
+end
+live_loop :get_n4 do
+  val = sync '/01_n4'
+  n4 = val[0]
+end
+live_loop :get_n5 do
+  val = sync '/01_n5'
+  n5 = val[0]
+end
+live_loop :get_n6 do
+  val = sync '/01_n6'
+  n6 = val[0]
+end
+live_loop :get_n7 do
+  val = sync '/01_n7'
+  n7 = val[0]
+end
+live_loop :get_n8 do
+  val = sync '/01_n8'
+  n8 = val[0]
+end
+live_loop :get_n9 do
+  val = sync '/01_n9'
+  n9 = val[0]
+end
+live_loop :get_n10 do
+  val = sync '/01_n10'
+  n10 = val[0]
+end
+live_loop :get_n12 do
+  val = sync '/01_n12'
+  n12 = val[0]
+end
+live_loop :get_n13 do
+  val = sync '/01_n13'
+  n13 = val[0]
+end
+live_loop :get_n14 do
+  val = sync '/01_n14'
+  n14 = val[0]
+end
+live_loop :get_n15 do
+  val = sync '/01_n15'
+  n15 = val[0]
+end
 
-OscP5 oscP5;                      //Communication
-NetAddress sonicPi;               //where the messages go
-ControlP5 cp5;                    //Interface
+att = 0
+live_loop :get_att do
+  val = sync '/01_att'
+  att = val[0]
+end
+sus = 0
+live_loop :get_sus do
+  val = sync '/01_sus'
+  sus = val[0]
+end
+rel = 0.25
+live_loop :get_rel do
+  val = sync '/01_rel'
+  rel = val[0]
+end
+vol = 1
+live_loop :get_vol do
+  val = sync '/01_vol'
+  vol = val[0]
+end
+do_synth = :beep
+live_loop :get_synth do
+  val = sync '/01_synth'
+  do_synth = :beep if val[0] == 0
+  do_synth = :blade if val[0] == 1
+  do_synth = :prophet if val[0] == 2
+  do_synth = :tb303 if val[0] == 3
+  do_synth = :hoover if val[0] == 4
+  do_synth = :growl if val[0] == 5
+  do_synth = :tech_saws if val[0] == 6
+  do_synth = :piano if val[0] == 7
+  do_synth = :pluck if val[0] == 8
+  do_synth = :pretty_bell if val[0] == 9
+end
+do_bpm = 120
+live_loop :get_bpm do
+  val = sync '/01_bpm'
+  do_bpm = val[0]
+end
 
-boolean enableComms = true;
-PFont pfont12, pfont15, pfont20;
-
-void setup() {
-
-  size(1000, 600, P3D);  //set up window
-  smooth();    
-  //Network adress to communicate with Sonic Pi
-  oscP5 = new OscP5(this, 8000);                  
-  sonicPi = new NetAddress("127.0.0.1", 4559);
-  pfont20 = createFont("Georgia", 20, true);
-  pfont15 = createFont("Georgia", 15, true);
-  pfont12 = createFont("Georgia", 12, true);
-  createUI();                              
-  enableComms = true;
-}
-
-//Methods for sending key/value to Sonic Pi
-void sendOsc(String name, int value) {
-  OscMessage toSend = new OscMessage("/" + name);
-  toSend.add((int)value);
-  oscP5.send(toSend, sonicPi);
-}
-void sendOsc(String name, float value) {
-  OscMessage toSend = new OscMessage("/" + name);
-  toSend.add((float)value);
-  oscP5.send(toSend, sonicPi);
-}
-
-//fill in the Background
-void draw() {
-  background(30);
-  drawBackground();
-}
-
-//Draw all lines
-void drawBackground() {
-  fill(0);
-
-  stroke(255);
-  //horizontal
-  line(0, 100, 100, 100);
-  line(500, 100, 1000, 100);
-  line(800, 200, 1000, 200);
-  line(800, 300, 1000, 300);
-  line(800, 400, 1000, 400);
-  line(800, 500, 1000, 500);
-  line(600, 200, 800, 200);
-  //vertical
-  line(100, 0, 100, 100);
-  line(500, 0, 500, 100);
-  line(800, 0, 800, 600);
-  line(600, 200, 600, 600);
-}
-
-void createUI() {
-  ControlFont fontl = new ControlFont(pfont20);
-  ControlFont fontm = new ControlFont(pfont15);
-  ControlFont fonts = new ControlFont(pfont12);
-
-  //create canvas for the controls
-  cp5 = new ControlP5(this);
-  //Labels
-  cp5.addTextlabel("title").setText("DF-01 Bass \nby Davids Fiddle").setPosition(525, 25).setFont(fontl);
-  cp5.addTextlabel("thanks").setText("Running with Sonic Pi\nby Sam Aaron\nand Processing 3\nby Ben Fry and Casey Reas").setPosition(825, 25).setFont(fonts);
-  cp5.addTextlabel("Version").setText("v.0.1").setPosition(750, 75).setFont(fonts);
-  //secondary synth
-  cp5.addTextlabel("secondary").setText("Secondary Synth").setPosition(620, 200).setFont(fontl);
-
-  //volume knob
-  cp5.addKnob("vol1").setRange(0, 1).setValue(1).setPosition(25, 25).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Master").setDecimalPrecision(2).setFont(fonts);
-  //ADSR
-  cp5.addKnob("att").setRange(0, 4).setValue(0.1).setPosition(125, 25).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("A").setDecimalPrecision(2).setFont(fonts);
-  cp5.addKnob("dec").setRange(0, 4).setValue(0.1).setPosition(225, 25).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("D").setDecimalPrecision(2).setFont(fonts);
-  cp5.addKnob("sus").setRange(0, 4).setValue(0).setPosition(325, 25).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("S").setDecimalPrecision(2).setFont(fonts);
-  cp5.addKnob("rel").setRange(0, 4).setValue(1).setPosition(425, 25).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("R").setDecimalPrecision(2).setFont(fonts);
-  //FX
-  cp5.addKnob("cutMix").setRange(0, 1).setValue(0).setPosition(825, 125).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Cutoff").setDecimalPrecision(1).setFont(fonts);
-  cp5.addKnob("cutFreq").setRange(30, 120).setValue(120).setPosition(925, 125).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Freq").setDecimalPrecision(1).setFont(fonts);
-  cp5.addKnob("verbMix").setRange(0, 1).setValue(0).setPosition(825, 225).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Reverb").setDecimalPrecision(1).setFont(fonts);
-  cp5.addKnob("verbRoom").setRange(0, 1).setValue(0.6).setPosition(925, 225).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Room").setDecimalPrecision(1).setFont(fonts);
-  cp5.addKnob("ixiMix").setRange(0, 1).setValue(0).setPosition(825, 325).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Ixi").setDecimalPrecision(1).setFont(fonts);
-  cp5.addKnob("ixiPhase").setRange(0.1, 16).setValue(4).setPosition(925, 325).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Phase").setDecimalPrecision(1).setFont(fonts);
-  cp5.addKnob("bcMix").setRange(0, 1).setValue(0).setPosition(825, 425).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("B.C.").setDecimalPrecision(1).setFont(fonts);
-  cp5.addKnob("bcDepth").setRange(1, 16).setValue(8).setPosition(925, 425).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Depth").setDecimalPrecision(1).setFont(fonts);
-  cp5.addKnob("flanMix").setRange(0, 1).setValue(0).setPosition(825, 525).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Flanger").setDecimalPrecision(1).setFont(fonts);
-  cp5.addKnob("flanPhase").setRange(0.1, 16).setValue(4).setPosition(925, 525).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Phase").setDecimalPrecision(1).setFont(fonts);
+#This is a clock divider
+c_s = 0
+c_e = 0
+c_q = 0
+c_h = 0
+live_loop :clock do
+  with_bpm do_bpm do
+    cue :h, c_h
+    c_h = c_h + 1
+    cue :q, c_q
+    c_q = c_q + 1
+    cue :e, c_e
+    c_e = c_e + 1
+    cue :s, c_s
+    c_s = c_s + 1
+    sleep 0.25
+    cue :s, c_s
+    c_s = c_s + 1
+    sleep 0.25
+    cue :e, c_e
+    c_e = c_e + 1
+    cue :s, c_s
+    c_s = c_s + 1
+    sleep 0.25
+    cue :s, c_s
+    c_s = c_s + 1
+    sleep 0.25
+    cue :q, c_q
+    c_q = c_q + 1
+    cue :e, c_e
+    c_e = c_e + 1
+    cue :s, c_s
+    c_s = c_s + 1
+    sleep 0.25
+    cue :s, c_s
+    c_s = c_s + 1
+    sleep 0.25
+    cue :e, c_e
+    c_e = c_e + 1
+    cue :s, c_s
+    c_s = c_s + 1
+    sleep 0.25
+    cue :s, c_s
+    c_s = c_s + 1
+    sleep 0.25
+  end
+end
 
 
-  //second synth controls
-  cp5.addKnob("vol2").setRange(0, 1).setValue(0).setPosition(625, 250).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Vol").setDecimalPrecision(2).setFont(fonts);
-  cp5.addKnob("trans").setRange(-12, 12).setValue(0).setPosition(725, 250).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Trans").setDecimalPrecision(0).setFont(fonts);
-  //secondary FX
-  cp5.addKnob("ixi2").setRange(0, 1).setValue(0).setPosition(625, 450).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Ixi").setDecimalPrecision(1).setFont(fonts);
-  cp5.addKnob("bc2").setRange(0, 1).setValue(0).setPosition(725, 450).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("B.C.").setDecimalPrecision(1).setFont(fonts);
-  cp5.addKnob("flan2").setRange(0, 1).setValue(0).setPosition(675, 525).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("Flanger").setDecimalPrecision(1).setFont(fonts);
-
-  //source1
-  cp5.addRadioButton("source1").setPosition(600, 100).setItemsPerRow(2).setItemWidth(100).setItemHeight(50)
-    .addItem("Beep", 0).addItem("Hoover", 1).addItem("Tb808", 2).addItem("Pulse", 3).align(CENTER, CENTER)
-    .activate(0).setNoneSelectedAllowed(false);
-  //source2
-  cp5.addRadioButton("source2").setPosition(600, 325).setItemsPerRow(2).setItemWidth(100).setItemHeight(50)
-    .addItem("Beep ", 0).addItem("Pluck", 1).addItem("Blade", 2).addItem("Pulse ", 3).align(CENTER, CENTER)
-    .activate(0).setNoneSelectedAllowed(false);
-
-  //set to
-  cp5.addButton("setF").setPosition(500, 200).setSize(100, 50).setLabel("F").setFont(fontl);
-  cp5.addButton("setE").setPosition(500, 250).setSize(100, 50).setLabel("E").setFont(fontl);
-  cp5.addButton("setD").setPosition(500, 300).setSize(100, 50).setLabel("D").setFont(fontl);
-  cp5.addButton("setC").setPosition(500, 350).setSize(100, 50).setLabel("C").setFont(fontl);
-  cp5.addButton("setB").setPosition(500, 400).setSize(100, 50).setLabel("B").setFont(fontl);
-  cp5.addButton("setA").setPosition(500, 450).setSize(100, 50).setLabel("A").setFont(fontl);
-  cp5.addButton("setG").setPosition(500, 500).setSize(100, 50).setLabel("G").setFont(fontl);
-
-  //sequencer sliders
-  cp5.addSlider("note1").setPosition(50, 125).setSize(30, 450).setRange(31, 55).setValue(0).setLabel(" 1").setDecimalPrecision(0);
-  cp5.addSlider("note2").setPosition(100, 125).setSize(30, 450).setRange(31, 55).setValue(0).setLabel(" 2").setDecimalPrecision(0);
-  cp5.addSlider("note3").setPosition(150, 125).setSize(30, 450).setRange(31, 55).setValue(0).setLabel(" 3").setDecimalPrecision(0);
-  cp5.addSlider("note4").setPosition(200, 125).setSize(30, 450).setRange(31, 55).setValue(0).setLabel(" 4").setDecimalPrecision(0);
-  cp5.addSlider("note5").setPosition(250, 125).setSize(30, 450).setRange(31, 55).setValue(0).setLabel(" 5").setDecimalPrecision(0);
-  cp5.addSlider("note6").setPosition(300, 125).setSize(30, 450).setRange(31, 55).setValue(0).setLabel(" 6").setDecimalPrecision(0);
-  cp5.addSlider("note7").setPosition(350, 125).setSize(30, 450).setRange(31, 55).setValue(0).setLabel(" 7").setDecimalPrecision(0);
-  cp5.addSlider("note8").setPosition(400, 125).setSize(30, 450).setRange(31, 55).setValue(0).setLabel(" 8").setDecimalPrecision(0);
-}
-
-//Send Osc-messages
-//Volume
-void vol1(float val) {
-  sendOsc("01_amp", val);
-}
-//primary synthesis
-void att(float val) {
-  sendOsc("01_att", val);
-}
-void dec(float val) {
-  sendOsc("01_dec", val);
-}
-void sus(float val) {
-  sendOsc("01_sus", val);
-}
-void rel(float val) {
-  sendOsc("01_rel", val);
-}
-
-//FX
-void cutMix(float val) {
-  sendOsc("01_cut_mix", val);
-}
-void cutFreq(float val) {
-  sendOsc("01_cut_freq", val);
-}
-void verbMix(float val) {
-  sendOsc("01_verb_mix", val);
-}
-void verbRoom(float val) {
-  sendOsc("01_verb_room", val);
-}
-void ixiMix(float val) {
-  sendOsc("01_ixi_mix", val);
-}
-void ixiPhase(float val) {
-  sendOsc("01_ixi_phase", val);
-}
-void bcMix(float val) {
-  sendOsc("01_bc_mix", val);
-}
-void bcPhase(float val) {
-  sendOsc("01_bc_phase", val);
-}
-void flanMix(float val) {
-  sendOsc("01_flan_mix", val);
-}
-void flanPhase(float val) {
-  sendOsc("01_flan_phase", val);
-}
-
-//secondary synthesis
-void vol2(float val) {
-  sendOsc("01_amp2", val);
-}
-void trans(float val) {
-  sendOsc("01_transpose", val);
-}
-void ixi2(float val) {
-  sendOsc("01_ixi2_phase", val);
-}
-void bc2(float val) {
-  sendOsc("01_bc2_depth", val);
-}
-void flan2(float val) {
-  sendOsc("01_flan2_phase", val);
-}
-
-void num_notes(int val) {
-  sendOsc("01_num_notes", val);
-}
-void source1(int val) {
-  sendOsc("01_source", val);
-}
-void source2(int val) {
-  sendOsc("01_source2", val);
-}
-
-void setF(float val) {
-  cp5.getController("note1").setValue(53);
-}
-void setE(float val) {
-  cp5.getController("note1").setValue(52);
-}
-void setD(float val) {
-  cp5.getController("note1").setValue(50);
-}
-void setC(float val) {
-  cp5.getController("note1").setValue(48);
-}
-void setB(float val) {
-  cp5.getController("note1").setValue(47);
-}
-void setA(float val) {
-  cp5.getController("note1").setValue(45);
-}
-void setG(float val) {
-  cp5.getController("note1").setValue(43);
-}
-
-void note1(float val) {
-  sendOsc("01_notes0", val);
-}
-void note2(float val) {
-  sendOsc("01_notes1", val);
-}
-void note3(float val) {
-  sendOsc("01_notes2", val);
-}
-void note4(float val) {
-  sendOsc("01_notes3", val);
-}
-void note5(float val) {
-  sendOsc("01_notes4", val);
-}
-void note6(float val) {
-  sendOsc("01_notes5", val);
-}
-void note7(float val) {
-  sendOsc("01_notes6", val);
-}
-void note8(float val) {
-  sendOsc("01_notes7", val);
-}
+live_loop :arp do
+  use_synth do_synth
+  use_synth_defaults attack: att, sustain: sus, release: rel, amp: vol
+  val = sync do_sync
+  play (ring n0,n1,n2,n3,n4,n5,n6,n7,n8,n9,n10,n11,n12,n13,n14,n15).take(length)[val[0]] if mode == 0
+  play (chord root, type, num_octaves: 6).take(length)[val[0]] if mode == 1
+end
