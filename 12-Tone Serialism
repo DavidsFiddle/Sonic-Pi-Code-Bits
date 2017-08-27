@@ -1,0 +1,35 @@
+#12-Tone Serialism
+#Coded by Davids Fiddle
+
+source = (note_range :c4, :c5)
+
+with_random_seed 334567 do
+  #This block creates the tone row and it's inverse
+  notes = source.shuffle
+  s = notes[0]
+  rnotes = [s]
+  #Go through the tonerow and invert it
+  12.times do
+    tick
+    rnotes[look + 1] = notes[look + 1] - (notes[look + 1] - s)*2
+  end
+  #play the tone row or some variation
+  uncomment do
+    8.times do
+      #Randomly choose what variation to play
+      i = rand_i(3)
+      12.times do
+        tick
+        #Original
+        play notes.look if i == 0
+        #Reverse
+        play notes.reverse.look if i == 1
+        #Inverse
+        play rnotes.ring.look if i == 2
+        #Inverse-Reverse
+        play rnotes.ring.reverse.look if i == 3
+        sleep (ring 0.25,0.5,0.75,1).choose
+      end
+    end
+  end
+end
