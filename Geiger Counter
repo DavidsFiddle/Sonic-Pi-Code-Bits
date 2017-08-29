@@ -1,0 +1,23 @@
+#Geiger Counter
+#Coded by Davids Fiddle
+
+set_volume! 1
+radiation_level = 6 #smaller values mean more clicks
+
+with_fx :bitcrusher, sample_rate: 10000, sample_rate_slide: 5 do |bit|
+  with_fx :reverb do
+    live_loop :geiger do
+      use_synth :pulse
+      use_synth_defaults sustain: 0, release: 0.05,
+        amp: (range 0.5,1.2,0.1).choose
+      play :d6 if one_in(radiation_level)
+      with_bpm 200 do
+        sleep 0.1
+      end
+    end
+    live_loop :con_bit do
+      control bit, sample_rate: (ring 2000,4000,6000,8000,10000).choose
+      sleep (ring 3,4,4,5,6).choose
+    end
+  end
+end
