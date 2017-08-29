@@ -1,0 +1,25 @@
+#Sonic Pi Siren
+#Coded by Davids Fiddle
+in_thread do
+  
+  #Parameters:
+  pitch0 = :d5
+  pitch1 = :d6
+  phase = 4 #in seconds
+  cycles = 2
+  cut_do = 1
+  cut_phase = 0.125 #in seconds
+  this_synth = :square
+  with_bpm 60 do
+    with_fx :slicer, mix: cut_do, phase: cut_phase do
+      sir = synth this_synth, note: pitch0, note_slide: phase,
+        sustain: phase * cycles * 2, release: 0
+      cycles.times do
+        control sir, note: pitch1
+        sleep phase
+        control sir, note: pitch0
+        sleep phase
+      end
+    end
+  end
+end
