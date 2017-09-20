@@ -1,0 +1,28 @@
+#Airplane Engine sound effect
+#Coded by Davids Fiddle
+
+sus = 3600 #Time in seconds
+rpm = 3000 #Rotation speed
+puts ph =  1.0 / (rpm / 60)
+cut = 90 #Cutoff
+rotor = 0.2 #Slice width, higher values are better for slower speeds
+mixture = 10
+
+synth :noise, sustain: sus, cutoff: 60, amp: 0.3
+
+with_fx :lpf, cutoff: cut, cutoff_slide: 2 do |cut|
+  with_fx :slicer, phase: ph, phase_slide: 2, pulse_width: rotor, smooth: 0.04 do |motor|
+    in_thread do
+      synth :noise, sustain: sus
+      synth :bnoise, sustain: sus, amp: 0.4
+      sleep sus
+    end
+  end
+  live_loop :pops do
+    use_synth :pluck
+    16.times do
+      play :d1,amp: 3, sustain: 0, release: ph*2 if one_in(mixture)
+      sleep ph
+    end
+  end
+end
