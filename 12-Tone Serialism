@@ -14,7 +14,9 @@ with_random_seed 334567 do
     rnotes[look + 1] = notes[look + 1] - (notes[look + 1] - s)*2
   end
   #play the tone row or some variation
-  uncomment do
+  in_thread do
+    sl = (ring 0.25,0.5,0.75,1).stretch(24).shuffle
+    use_synth :piano
     8.times do
       #Randomly choose what variation to play
       i = rand_i(3)
@@ -28,7 +30,29 @@ with_random_seed 334567 do
         play rnotes.ring.look if i == 2
         #Inverse-Reverse
         play rnotes.ring.reverse.look if i == 3
-        sleep (ring 0.25,0.5,0.75,1).choose
+        sleep sl.look
+      end
+    end
+  end
+  comment do #uncomment to play second voice
+    in_thread do
+      sl = (ring 0.25,0.5,0.75,1).stretch(24).shuffle
+      use_synth :piano
+      8.times do
+        #Randomly choose what variation to play
+        i = rand_i(3)
+        12.times do
+          tick
+          #Original
+          play notes.look if i == 0
+          #Reverse
+          play notes.reverse.look if i == 1
+          #Inverse
+          play rnotes.ring.look if i == 2
+          #Inverse-Reverse
+          play rnotes.ring.reverse.look if i == 3
+          sleep sl.look
+        end
       end
     end
   end
