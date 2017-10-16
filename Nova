@@ -1,0 +1,61 @@
+#Nova
+#live coded by Davids Fiddle
+
+use_bpm 120
+
+live_loop :kik do
+  sync :bass
+  sample :bd_haus,
+    amp: 1
+  sleep 1
+end
+
+live_loop :bass do
+  use_synth :tech_saws
+  tick
+  play :e3, amp: (ring 2,1,1).look
+  sleep 0.5
+end
+
+live_loop :bass2 do
+  use_synth :tech_saws
+  tick
+  12.times do
+    play :e3, amp: (ring 1,0.5,0.5).look
+    sleep 0.5
+  end
+  12.times do
+    play :d4, amp: (ring 1,0.5,0.5).look
+    sleep 0.5
+  end
+  12.times do
+    play :c4, amp: (ring 1,0.5,0.5).look
+    sleep 0.5
+  end
+  12.times do
+    play :d4, amp: (ring 1,0.5,0.5).look
+    sleep 0.5
+  end
+end
+
+live_loop :hat do
+  sample :drum_cymbal_closed,
+    rate: (range 0.5,1,0.1).choose,
+    amp: 0.8 if one_in(2)
+  sample :drum_cymbal_closed if one_in(4)
+  sleep 0.25
+end
+
+live_loop :bla do
+  sync :bass
+  tick
+  use_synth :blade
+  use_synth_defaults sustain: 3,
+    amp: 0.8
+  play (ring :e4,:d4,:c4,:b3,
+        :e4,:d4,:e4,:f4,
+        :e4,:d4,:c4,:b3,
+        :e4,:e4,:e4,:e4).look, amp: 0
+  play :e4, amp: 0
+  sleep 3
+end
