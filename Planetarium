@@ -1,0 +1,84 @@
+#Planetarium
+#Coded by Davids Fiddle
+use_bpm 120
+
+fade_d3 = (ring 0)#(ramp *(line 0,0.8, steps: 64))
+fade_drone = (ring 0)#(ramp *(line 0,1, steps: 8))
+fade_mel = (ring 0)
+fade_mel2 = (ring 0)
+
+comment do
+  in_thread do
+    sleep 64
+    cue :mel1
+    fade_mel = (ramp *(line 0,1, steps: 50))
+    sleep 16
+    cue :mel2
+    fade_mel2 = (ramp *(line 0,0.7, steps: 50))
+  end
+end
+
+with_fx :reverb do
+  live_loop :d3 do
+    use_synth :tech_saws
+    use_synth_defaults amp: fade_d3.look,
+      sustain: 0.2, release: 0.1
+    play (ring :e4,:r,:e4,:e4).tick
+    sleep 0.25
+  end
+end
+
+
+
+live_loop :hatz do
+  sample :drum_cymbal_closed, amp: 1, rate: 2 if one_in(2)
+  sample :drum_cymbal_closed, amp: 1, rate: 1.5 if one_in(3)
+  sleep 0.25
+end
+
+live_loop :snare do
+  sleep 1
+  sample :sn_dolf
+  sleep 1
+end
+
+with_fx :compressor do
+  live_loop :drone do
+    sync :d3
+    use_synth :tech_saws
+    use_synth_defaults sustain: 8,
+      amp: fade_drone.look
+    play (ring :e3,:d3,:e3,:b2,
+          :e3,:d3,:c3,:b2,
+          :e3,:d3,:e3,:b2,
+          :e3,:d3,:c3,:a2).tick
+    sleep 8
+  end
+  
+  live_loop :kik do
+    sample :bd_haus, amp: 2
+    sleep 0.5
+    sample :bd_haus, amp: 2 if one_in(10)
+    sleep 0.25
+    sample :bd_haus, amp: 2 if one_in(4)
+    sleep 0.25
+  end
+end
+
+with_fx :reverb do
+  sync :mel1
+  live_loop :melody do
+    use_synth :prophet
+    use_synth_defaults amp: fade_mel.tick
+    play (scale :e4, :minor, num_octaves: 2).choose
+    sleep (knit 0.25,2,0.5,5,0.75,2,1,1).choose
+  end
+  
+  sync :mel2
+  live_loop :melody2 do
+    use_synth :prophet
+    use_synth_defaults amp: fade_mel2.tick
+    play (scale :e3, :minor_pentatonic, num_octaves: 1).choose
+    sleep (knit 0.25,1,0.5,6,0.75,1,1,3).choose
+  end
+end
