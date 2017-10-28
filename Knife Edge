@@ -1,0 +1,66 @@
+#Knife Edge
+#Coded by Davids Fiddle
+
+use_bpm 120
+
+with_fx :reverb do
+  live_loop :shaker do
+    use_synth_defaults amp: 0
+    synth :noise, sustain: 0, release: 0.1, cutoff: 100 if one_in(2)
+    synth :noise, sustain: 0, release: 0.25, cutoff: 80 if one_in(4)
+    sleep 0.25
+  end
+end
+
+live_loop :cutter, sync: :kik do
+  use_synth :tech_saws
+  4.times do
+    c = play :d3, sustain: 3.5,
+      release: 1, note_slide: 0.25,
+      amp: 0.7
+    sleep 2
+    control c, note: :d4
+    sleep 2
+  end
+  4.times do
+    c = play :f3, sustain: 3.5,
+      release: 1, note_slide: 0.25,
+      amp: 0.7
+    sleep 2
+    control c, note: :f4
+    sleep 2
+  end
+end
+
+live_loop :melody do
+  use_synth :prophet
+  use_synth_defaults sustain: 0.25, amp: 1
+  play (scale :d4, :mixolydian).choose
+  sleep (knit 1,1,0.5,12,0.25,12,0.75,8).shuffle.tick
+end
+
+with_fx :compressor do
+  live_loop :arp, sync: :shaker do
+    use_synth :chipbass
+    use_synth_defaults amp: 1
+    32.times do
+      play (ring :d2,:d3,:d4,:a2,:a3,:r).choose
+      sleep 0.5
+    end
+    32.times do
+      play (ring :f2,:f3,:f4,:c3,:c4,:r).choose
+      sleep 0.5
+    end
+  end
+  
+  live_loop :kik, sync: :shaker do
+    sample :bd_haus
+    sample :sn_dolf if (ring 0,1).tick == 1
+    sleep 0.25
+    sample :bd_haus if one_in(10)
+    sleep 0.25
+    sleep 0.25
+    sample :bd_haus if one_in(7)
+    sleep 0.25
+  end
+end
