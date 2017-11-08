@@ -1,0 +1,30 @@
+#using scale degrees for smaller numbers
+#also makes it easier to change keys
+
+prob_tables = [
+(1),
+(2),
+(3),
+(4),
+(5),
+(6),
+(7),
+(0),
+]
+#each ring holds the possible next notes for that scale degree
+#this just plays the scale, change this to knit for actual use
+
+note = 1
+root = :c3
+key = :major
+
+live_loop :prob_melody do
+    #play the note. using the scale function let's you use small numbers
+    #if you want the melody to go over multiple octaves adapt the num_octaves
+    play (scale root,key, num_octaves: 1)[note]
+    #write something new into note
+    table = prob_tables[note]  #table now has the ring of notes that can be played next
+    note = table.choose  #a random note from the table is stored in note
+    #sleep
+    sleep 1
+end
