@@ -59,9 +59,9 @@ with_fx :rhpf, cutoff: 0, cutoff_slide: 0 do |hp|
         kill v01 if key == note && type == 0
         kill v02 if key == note && type == 0
         runP0 = 0 if key == note && type == 0
-        control v00, note: key if key != note && type == 1
-        control v01, note: key if key != note && type == 1
-        control v02, note: key if key != note && type == 1
+        control v00, note: (ramp *(ring :r,*(range 1,127),:r))[key + trans0] if key != note && type == 1
+        control v01, note: (ramp *(ring :r,*(range 1,127),:r))[key + trans1] if key != note && type == 1
+        control v02, note: (ramp *(ring :r,*(range 1,127),:r))[key + trans2] if key != note && type == 1
         note = key if key != note && type == 1
       end
       #kill v00
