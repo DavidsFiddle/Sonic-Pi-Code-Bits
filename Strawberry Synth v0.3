@@ -1,0 +1,245 @@
+#Strawberry Synth v0.3
+#State 05.11.2017
+#Coded by Davids Fiddle
+
+#Midi device, channel
+sync_adress_key_on = "/midi/apc_key_25_midi_1/1/2/note_on"
+sync_adress_key_off = "/midi/apc_key_25_midi_1/1/2/note_off"
+sync_adress_key_filter = "/midi/apc_key_25_midi_1/1/1/control_change"
+
+#settings for synthesis
+slide = 0
+runP0 = 0 #marker if this block is running
+trans0 = 0 #transposition of this oscillator
+trans1 = 0
+trans2 = 0
+det0 = 0 #detune in cent of this oscillator
+det1 = 0
+det2 = 0
+vol0 = 1 #volume of this oscillator
+vol1 = 1
+vol2 = 1
+syn0 = :saw #synth used for this oscillator
+syn1 = :saw
+syn2 = :saw
+
+
+########################
+#Key Section starts here
+########################
+
+#Filters for Keys
+with_fx :rhpf, cutoff: 0, cutoff_slide: 0 do |hp|
+  with_fx :rlpf, cutoff: 120, cutoff_slide: 0 do |lp|
+    #controling the filters
+    live_loop :con_lp do
+      key, val = sync sync_adress_key_filter
+      control lp, cutoff: val if key == 51 #The MIDI CC that controls the low pass
+    end
+    live_loop :con_hp do
+      key, val = sync sync_adress_key_filter
+      control hp, cutoff: val if key == 55 #The MIDI CC that controls the high pass
+    end
+    #Synthesis starts here
+    live_loop :p0 do
+      note, vel = sync sync_adress_key_on
+      use_synth_defaults sustain: 3600, note_slide: slide
+      runP0 = 1
+      use_cent_tuning det0
+      v00 = synth syn0, note: (ramp *(ring :r,*(range 1,127),:r))[note + trans0], amp: vol0
+      use_cent_tuning det1
+      v01 = synth syn1, note: (ramp *(ring :r,*(range 1,127),:r))[note + trans1], amp: vol1
+      use_cent_tuning det2
+      v02 = synth syn2, note: (ramp *(ring :r,*(range 1,127),:r))[note + trans2], amp: vol2
+      
+      while runP0 == 1
+        key, type = sync "note_change"  #Listening to an internal message to be able to react to two different events
+        #kil, val = sync sync_adress_key_off    #old method without slide
+        kill v00 if key == note && type == 0
+        kill v01 if key == note && type == 0
+        kill v02 if key == note && type == 0
+        runP0 = 0 if key == note && type == 0
+        control v00, note: key if key != note && type == 1
+        control v01, note: key if key != note && type == 1
+        control v02, note: key if key != note && type == 1
+        note = key if key != note && type == 1
+      end
+      #kill v00
+      #kill v01
+      #kill v02
+    end
+  end
+end
+
+live_loop :con_slide do
+  key, val = sync sync_adress_key_filter
+  slide = val / 60.0 if key == 52 #The MIDI CC that controls the high pass
+end
+
+
+live_loop :look_slide do
+  #looks for a new key press and sends it to the synth section
+  #used to slide between notes
+  key, val = sync sync_adress_key_on
+  cue "note_change", key, 1
+end
+
+live_loop :look_off do
+  #looks for a key release and sends it to the synth section
+  key, val = sync sync_adress_key_off
+  cue "note_change", key, 0
+end
+
+live_loop :p1_presets do
+  i,v = sync "/midi/apc_key_25_midi_1/1/1/note_on"
+  #calls presets when the key is pressed
+  #to change settings
+  preset10 if i == 64
+  preset11 if i == 65
+  preset12 if i == 66
+  preset13 if i == 67
+  preset14 if i == 68
+  preset15 if i == 69
+  preset16 if i == 70
+  preset17 if i == 71
+  preset_null if i == 81
+end
+
+#Preset area beginns here
+
+define :preset_lights_off do
+  #turn all lights off
+  midi_note_on 64,0,channel: 1
+  midi_note_on 65,0,channel: 1
+  midi_note_on 66,0,channel: 1
+  midi_note_on 67,0,channel: 1
+  midi_note_on 68,0,channel: 1
+  midi_note_on 69,0,channel: 1
+  midi_note_on 70,0,channel: 1
+  midi_note_on 71,0,channel: 1
+end
+
+define :preset10 do
+  #Slot 0
+  #manage lights
+  preset_lights_off
+  midi_note_on 64,1,channel: 1
+  #set values
+  trans0 = 0
+  trans1 = 0
+  trans2 = -12
+  det0 = 0
+  det1 = 3
+  det2 = -2
+  vol0 = 1
+  vol1 = 0.7
+  vol2 = 0.5
+  syn0 = :saw
+  syn1 = :saw
+  syn2 = :saw
+end
+define :preset11 do
+  #Slot 1
+  #manage lights
+  preset_lights_off
+  midi_note_on 65,1,channel: 1
+  #set values
+  trans0 = 0
+  trans1 = -12
+  trans2 = -12
+  det0 = 0
+  det1 = 3
+  det2 = -2
+  vol0 = 1
+  vol1 = 0.7
+  vol2 = 0.5
+  syn0 = :saw
+  syn1 = :saw
+  syn2 = :saw
+end
+define :preset12 do
+  #Slot 2
+  #manage lights
+  preset_lights_off
+  midi_note_on 66,1,channel: 1
+  #set values
+  trans0 = 0
+  trans1 = 7
+  trans2 = -12
+  det0 = 0
+  det1 = 0
+  det2 = -2
+  vol0 = 1
+  vol1 = 0.5
+  vol2 = 0.5
+  syn0 = :saw
+  syn1 = :tri
+  syn2 = :saw
+end
+define :preset13 do
+  #Slot 3
+  #manage lights
+  preset_lights_off
+  midi_note_on 67,2,channel: 1
+end
+define :preset14 do
+  #Slot 4
+  #manage lights
+  preset_lights_off
+  midi_note_on 68,1,channel: 1
+
+  trans0 = 0
+  trans1 = 0.02
+  trans2 = -11.98
+  det0 = 0
+  det1 = 0
+  det2 = 0
+  vol0 = 1
+  vol1 = 0.7
+  vol2 = 0.5
+  syn0 = :saw
+  syn1 = :saw
+  syn2 = :saw
+end
+define :preset15 do
+  #Slot 5
+  #manage lights
+  preset_lights_off
+  midi_note_on 69,2,channel: 1
+end
+define :preset16 do
+  #Slot 6
+  #manage lights
+  preset_lights_off
+  midi_note_on 70,2,channel: 1
+end
+define :preset17 do
+  #Slot 7
+  #manage lights
+  preset_lights_off
+  midi_note_on 71,2,channel: 1
+end
+define :preset_null do
+  #Restore initial settings for
+  #Keys
+  preset_lights_off
+  trans0 = 0 #transposition of this oscillator
+  trans1 = 0
+  trans2 = 0
+  det0 = 0 #detune in cent of this oscillator
+  det1 = 0
+  det2 = 0
+  vol0 = 1 #volume of this oscillator
+  vol1 = 1
+  vol2 = 1
+  syn0 = :saw #synth used for this oscillator
+  syn1 = :saw
+  syn2 = :saw
+  /
+    #Bass
+    b_syn0, b_syn1 = :saw
+    b_det0, b_det1 = 0
+    b_trans0, b_trans1 = 0
+    b_vol0, b_vol1 = 1
+    /
+end
