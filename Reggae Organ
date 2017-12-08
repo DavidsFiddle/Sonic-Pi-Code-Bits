@@ -1,0 +1,28 @@
+#Reggae Organ
+#Coded by Davids Fiddle
+
+use_bpm 120
+
+define :reg_organ do |notes|
+  use_synth :sine
+  play_chord notes
+  use_synth :sine
+  with_transpose -12 do
+    play_chord notes, amp: 0.8
+  end
+  use_synth :piano
+  play notes[0], amp: 0.6
+end
+
+with_fx :reverb do
+  with_fx :wobble, cutoff_min: 70, phase: 5.1, wave: 3, mix: 0.6 do
+    live_loop :reggae1 do
+      reg_organ (chord :c5,:major) if (ring 0,1).tick == 1
+      sleep 1
+    end
+    live_loop :reggae2 do
+      reg_organ (chord :c4,:major) if (ring 0,1,0,1).tick == 1
+      sleep (ring 0.7,0.3,0.7,0.3).look
+    end
+  end
+end
