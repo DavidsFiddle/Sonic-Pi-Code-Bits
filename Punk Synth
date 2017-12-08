@@ -1,0 +1,38 @@
+#Punk Rock Style
+#Coded by Davids Fiddle
+
+blast = (ring 1,1,1,1,1,1,1,1)
+kik = (ring 1,0,0,0,1,0,0,0)
+
+#Beat:
+live_loop :drums do
+  tick
+  sample :drum_cymbal_open if (ring 0,0,1,0,0,0,1,0).look == 1
+  sample :sn_dolf if (ring 1,0,0,1,0,1,0,0).look == 1
+  sample :drum_bass_hard, amp: 1 if kik.look == 1
+  sleep 0.25
+end
+
+#Synth 1:
+h = 2
+q = 1
+e = 0.5
+s = 0.25
+
+with_fx :reverb do
+  live_loop :synth1 do
+    tick
+    use_synth :saw
+    play (knit :d3,4,:e3,4,:c3,4,:a2,4).look
+    use_synth :sine
+    play (knit :d4,4,:e4,4,:c4,4,:a3,4).look
+    sleep (ring e+s,e,s,e).look
+  end
+  
+  live_loop :synth2 do
+    use_synth :tb303
+    use_synth_defaults sustain: q+e, release: q
+    play (ring :d2,:e2,:c2,:a1).tick
+    sleep h
+  end
+end
