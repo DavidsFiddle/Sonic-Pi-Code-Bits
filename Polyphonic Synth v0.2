@@ -1,0 +1,84 @@
+#Polyphonic Synth for the Strawberry Synth project
+#
+#can play 4 keys at the same time, doesn't accept new keys while 4 are pressed
+
+
+#Voice blocks for 4x polyphony
+#Can be extended
+live_loop :p0 do
+  use_real_time
+  key, vel = sync 'p0_on'  #listens to the sync from the distributing loop
+  v0 = synth :saw, note: key, sustain: 360  #creates the new synth
+  sync 'p0_off'
+  kill v0
+end
+live_loop :p1 do
+  use_real_time
+  key, vel = sync 'p1_on'
+  v0 = synth :saw, note: key, sustain: 360
+  sync 'p1_off'
+  kill v0
+end
+live_loop :p2 do
+  use_real_time
+  key, vel = sync 'p2_on'
+  v0 = synth :saw, note: key, sustain: 360
+  sync 'p2_off'
+  kill v0
+end
+live_loop :p3 do
+  use_real_time
+  key, vel = sync 'p3_on'
+  v0 = synth :saw, note: key, sustain: 360
+  sync 'p3_off'
+  kill v0
+end
+
+current = [0,0,0,0]  #this list stores the currently played note in the corresponding voice. 0 means the voice is inactive
+live_loop :distrib_on, delay: 1 do
+  #distributing loop for note_on events
+  #looks up the current list and sends cues to the voice loops
+  use_real_time
+  key, vel = sync "/midi/apc_key_25_midi_1/1/2/note_on"
+  if current[0] == 0
+    cue 'p0_on', key, vel  #sends the cue with the key to play
+    current[0] = key  #updates the current list
+  elsif current[1] == 0
+    cue 'p1_on', key, vel
+    current[1] = key
+  elsif current[2] == 0
+    cue 'p2_on', key, vel
+    current[2] = key
+  elsif current[3] == 0
+    cue 'p3_on', key, vel
+    current[3] = key
+  end
+end
+
+live_loop :distrib_off do
+  #listens to note_off events
+  key, vel = sync "/midi/apc_key_25_midi_1/1/2/note_off"
+  if current[0] == key
+    cue 'p0_off'
+    current[0] = 0  #resets the current list so this voice can be used again
+  elsif current[1] == key
+    cue 'p1_off'
+    current[1] = 0
+  elsif current[2] == key
+    cue 'p2_off'
+    current[2] = 0
+  elsif current[3] == key
+    cue 'p3_off'
+    current[3] = 0
+  end
+end
+
+
+################
+#To Do:
+#real time!!!
+#multiple synth calls per voice for more sound options
+#preset system
+#cleanup, comments
+#make it easier to change midi devices
+################
