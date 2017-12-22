@@ -1,0 +1,95 @@
+#Sampler for the Strawberry Synth Project
+#Coded by Davids Fiddle
+#v0.5
+
+use_debug false
+
+#Variables
+#Adresses of the midi device used for this synth
+io_midi_on = "/midi/apc_key_25_midi_1/1/1/note_on"
+io_midi_buttons = "/midi/apc_key_25_midi_1/1/1/note_on"
+io_button_b0 = 82
+io_button_b1 = 83
+io_button_b2 = 84
+io_button_b3 = 85
+io_button_b4 = 86
+#Sample banks:
+use_bank = 0
+#The sample banks
+banks = [[],
+         [],
+         [],
+         [],
+         []]
+types = [[0,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,],
+         [0,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,],
+         [0,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,],
+         [0,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,],
+         [0,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,]]
+            
+#set the button lights
+define :light_b do |key|
+  midi_note_on io_button_b0,0,channel: 1
+  midi_note_on io_button_b1,0,channel: 1
+  midi_note_on io_button_b2,0,channel: 1
+  midi_note_on io_button_b3,0,channel: 1
+  midi_note_on io_button_b4,0,channel: 1
+  midi_note_on key, 1,channel: 1
+end
+
+#loop for reading the buttons
+live_loop :get_bank do
+  key, vel = sync io_midi_buttons
+  if key == io_button_b0
+    use_bank = 0
+    light_b, io_button_b0
+  elsif key == io_button_b1
+    use_bank = 1
+    light_b, io_button_b1
+  elsif key == io_button_b2
+    use_bank = 2
+    light_b, io_button_b2
+  elsif key == io_button_b3
+    use_bank = 3
+    light_b, io_button_b3
+  elsif key == io_button_b4
+    use_bank = 4
+    light_b, io_button_b4
+  end
+  light_p
+end
+
+#set the lights for the pads
+define :light_p do
+  i = 0
+  for l in types[use_bank]
+    midi_note_on i,l,channel: 1
+    i = i + 1
+  end
+end
+
+#loop to trigger the samples
+live_loop :trigger do
+  key, vel = sync io_midi_on
+  sample banks[use_bank][key]
+end
