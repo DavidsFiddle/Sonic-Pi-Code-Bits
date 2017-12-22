@@ -1,0 +1,228 @@
+#Monophonic Synth for the Strawberry Synth Project
+#Coded by Davids Fiddle
+#v0.5
+
+use_debug false
+
+#Variables
+current = 0
+#Adresses of the midi device used for this synth
+io_midi_on = "/midi/apc_key_25_midi_1/1/2/note_on"
+io_midi_off = "/midi/apc_key_25_midi_1/1/2/note_off"
+io_midi_knob = "/midi/apc_key_25_midi_1/1/1/control_change"
+io_midi_buttons = "/midi/apc_key_25_midi_1/1/1/note_on"
+io_knob_lpf = 51
+io_knob_hpf = 55
+io_knob_res = 50
+io_knob_att = 48
+io_knob_rel = 49
+io_knob_slide = 54
+#Synth voice settings
+att = 0
+rel = 0.1
+tslide = 0
+#synth_defaults
+dep = 1 #for :fm
+div = 2 #for :fm
+res = 0.8 #resonance, for multiple synths
+pwm = 0.5 #pulse width
+#sound source to use
+syn0 = :tri
+syn1 = :tri
+syn2 = :tri
+#transposition from the pressed key
+trans0 = 0
+trans1 = 0
+trans2 = 0
+#fine detune
+det0 = 0
+det1 = 0
+det2 = 0
+#volume of the source
+amp0 = 1
+amp1 = 1
+amp2 = 1
+#FX settings
+lpf_cut = 127
+hpf_cut = 0
+
+#reading attack/release/slide times
+live_loop :get_ar do
+  key, val  sync io_midi_knob
+  if key == io_knob_att
+    att = val / 64.0
+  elsif key == io_knob_rel
+    rel = val / 64.0
+  elsif key == io_knob_slide
+    tslide = val / 32.0
+  end
+end
+
+#Synthesis starts here:
+with_fx :rlpf, cutoff: 127, cutoff_slide: 0.1, res: 0.5, res_slide: 0.1 do |lpf|
+with_fx :rhpf, cutoff: 0, cutoff_slide: 0.1, res: 0.5, res_slide: 0.1 do |hpf|
+#FX controls
+live_loop :con_filter do
+  key, val  sync io_midi_knob
+  if key == io_knob_lpf
+    control lpf, cutoff: val  #input = midi note
+  elsif key == io_knob_hpf
+    control hpf, cutoff: val  #input = midi note
+  elsif key == io_knob_res
+    control lpf, res: val / 127.1  #mapped to 0<=res<1
+    control hpf, res: val / 127.1  #mapped to 0<=res<1
+  end
+end
+
+#Voice loop
+live_loop :voice do
+  use_real_time  #should remove latency
+  key, vel = sync 'voice_on'
+  use_synth_defaults depth: dep, divisor: div, res: res #pulse width?
+  v0 = synth syn0, note: note: (ramp *(ring :r,*(range 1,127),:r))[key + trans0] + (det0 / 100.0), sustain: 360, amp: amp0, attack: att, amp_slide: rel, note_slide: tslide
+  v1 = synth syn1, note: note: (ramp *(ring :r,*(range 1,127),:r))[key + trans1] + (det2 / 100.0), sustain: 360, amp: amp1, attack: att, amp_slide: rel, note_slide: tslide
+  v2 = synth syn2, note: note: (ramp *(ring :r,*(range 1,127),:r))[key + trans2] + (det1 / 100.0), sustain: 360, amp: amp2, attack: att, amp_slide: rel, note_slide: tslide
+  key sync 'voice_change'
+  if key == -1
+    kill v0
+    kill v1
+    kill v2
+  else
+    control v0, note: (ramp *(ring :r,*(range 1,127),:r))[key + trans0] + (det0 / 100.0)
+    control v1, note: (ramp *(ring :r,*(range 1,127),:r))[key + trans1] + (det1 / 100.0)
+    control v2, note: (ramp *(ring :r,*(range 1,127),:r))[key + trans2] + (det2 / 100.0)
+  end
+end
+
+live_loop :key_on do
+  key, vel = sync io_midi_on
+  if key == current
+    cue 'voice_on', key, vel 
+  else
+    cue 'voice_change', key, vel
+  end
+end
+live_loop :key_off do
+  key, vel = sync io_midi_off
+  cue 'voice_change', key, -1 if key == current
+end
+
+end#Filter end
+end
+
+#Preset listener:
+
+live_loop :look_preset do
+  key, vel = sync io_midi_buttons
+  #Trigger presets when a button is pressed and reset lights. The preset defs activate the lights.
+  #Lights will flash if a preset is not filled
+  reset_preset_lights
+  preset0 if key == 81
+  preset1 if key == 64
+  preset2 if key == 65
+  preset3 if key == 66
+  preset4 if key == 67
+  preset5 if key == 68
+  preset6 if key == 69
+  preset7 if key == 70
+  preset7 if key == 71
+  
+end
+
+#reset the lights on the presets
+define :reset_preset_lights do
+  #one call for every button that is used for presets
+  midi_note_on 64,0,channel: 1
+  midi_note_on 65,0,channel: 1
+  midi_note_on 66,0,channel: 1
+  midi_note_on 67,0,channel: 1
+  midi_note_on 68,0,channel: 1
+  midi_note_on 69,0,channel: 1
+  midi_note_on 70,0,channel: 1
+  midi_note_on 71,0,channel: 1
+  midi_note_on 81,0,channel: 1
+end
+
+#Definitions for all presets
+define :preset0 do
+  midi_note_on 81,1,channel: 1
+  puts "00-Raw"  #Name of this Preset
+  #attack/release times
+  att = 0
+  rel = 0
+  dep = 1 #for :fm
+  div = 2 #for :fm
+  res = 0.8 #resonance, for multiple synths
+  pwm = 0.5 #pulse width
+  #sound source to use
+  syn0 = :tri
+  syn1 = :tri
+  syn2 = :tri
+  #transposition from the pressed key
+  trans0 = 0
+  trans1 = 0
+  trans2 = 0
+  #fine detune
+  det0 = 0
+  det1 = 0
+  det2 = 0
+  #volume of the source
+  amp0 = 1
+  amp1 = 1
+  amp2 = 1
+end
+define :preset1 do
+  midi_note_on 64,2,channel: 1
+  puts "01-FM"  #Name of this Preset
+  #attack/release times
+  att = 0
+  rel = 0.1
+  dep = 1 #for :fm
+  div = 2 #for :fm
+  res = 0.8 #resonance, for multiple synths
+  pwm = 0.5 #pulse width
+  #sound source to use
+  syn0 = :fm
+  syn1 = :fm
+  syn2 = :fm
+  #transposition from the pressed key
+  trans0 = 0
+  trans1 = 0
+  trans2 = 12
+  #fine detune
+  det0 = 0
+  det1 = -2
+  det2 = 0
+  #volume of the source
+  amp0 = 1
+  amp1 = 1
+  amp2 = 0.8
+end
+define :preset2 do
+  midi_note_on 65,2,channel: 1
+  puts "02-Empty"  #Name of this Preset
+end
+define :preset3 do
+  midi_note_on 66,2,channel: 1
+  puts "03-Empty"  #Name of this Preset
+end
+define :preset4 do
+  midi_note_on 67,2,channel: 1
+  puts "04-Empty"  #Name of this Preset
+end
+define :preset5 do
+  midi_note_on 68,2,channel: 1
+  puts "05-Empty"  #Name of this Preset
+end
+define :preset6 do
+  midi_note_on 69,2,channel: 1
+  puts "06-Empty"  #Name of this Preset
+end
+define :preset7 do
+  midi_note_on 70,2,channel: 1
+  puts "07-Empty"  #Name of this Preset
+end
+define :preset8 do
+  midi_note_on 71,2,channel: 1
+  puts "08-Empty"  #Name of this Preset
+end
