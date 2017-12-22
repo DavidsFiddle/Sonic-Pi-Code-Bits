@@ -225,61 +225,10 @@ live_loop :distrib_on, delay: 1 do
   end
 end
 
-live_loop :distrib_seq_on, delay: 1 do
-  #distributing loop for note_on events from the sequencer
-  #looks up the current list and sends cues to the voice loops
-  use_real_time
-  key, vel = sync 'seq_on'
-  if current[0] == 0
-    cue 'p0_on', key, vel  #sends the cue with the key to play
-    current[0] = key  #updates the current list
-  elsif current[1] == 0
-    cue 'p1_on', key, vel
-    current[1] = key
-  elsif current[2] == 0
-    cue 'p2_on', key, vel
-    current[2] = key
-  elsif current[3] == 0
-    cue 'p3_on', key, vel
-    current[3] = key
-   elsif current[4] == 0
-    cue 'p4_on', key, vel
-    current[4] = key
-   elsif current[5] == 0
-    cue 'p5_on', key, vel
-    current[5] = key
-  end
-end
-
 live_loop :distrib_off do
   #listens to note_off events
   usr_real_time
   key, vel = sync io_midi_off
-  if current[0] == key
-    cue 'p0_off'
-    current[0] = 0  #resets the current list so this voice can be used again
-  elsif current[1] == key
-    cue 'p1_off'
-    current[1] = 0
-  elsif current[2] == key
-    cue 'p2_off'
-    current[2] = 0
-  elsif current[3] == key
-    cue 'p3_off'
-    current[3] = 0
-  elsif current[4] == key
-    cue 'p4_off'
-    current[4] = 0
-  elsif current[5] == key
-    cue 'p5_off'
-    current[5] = 0
-  end
-end
-
-live_loop :distrib__seq_off do
-  #listens to note_off events from the sequencer
-  usr_real_time
-  key, vel = sync 'seq_off'
   if current[0] == key
     cue 'p0_off'
     current[0] = 0  #resets the current list so this voice can be used again
