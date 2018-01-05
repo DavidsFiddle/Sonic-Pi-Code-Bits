@@ -1,6 +1,6 @@
 #A preset bank for Sonic Pi
 #Coded/curated by Davids Fiddle
-#04.01.2018
+#05.01.2018
 
 
 #If you want to see your own presets on this list send them to me, following the blueprint.
@@ -10,5 +10,105 @@
 define :blueprint do |note|
   #Author
   #Short description
+  #Comment
   synth :sine, note: note
+end
+
+define :organ_low do |note|
+  #Davids Fiddle
+  #Low Organ
+  use_merged_synth_defaults attack: 0.2
+  with_fx :reverb, room: 0.7 do
+    synth :tri, note: note, amp: 1
+    synth :tri, note: note + 0.02, amp: 1
+    synth :tri, note: note + 0.01, amp: 0.8
+    synth :tri, note: note, amp: 0.4
+  end
+  use_merged_synth_defaults attack: 0
+  synth :tri, note: note, amp: 0.8
+  synth :tri, note: note + 0.02, amp: 0.8
+end
+
+define :organ_high do |note|
+  #Davids Fiddle
+  #High Organ
+  use_merged_synth_defaults attack: 0.2
+  with_fx :reverb, room: 0.7 do
+    synth :tri, note: note, amp: 1
+    synth :tri, note: note + 0.02, amp: 1
+    synth :tri, note: note + 12.01, amp: 0.8
+    synth :tri, note: note - 12, amp: 0.4
+  end
+  with_fx :reverb, room: 0.9 do
+    synth :saw, note: note + 12, amp: 1
+    synth :saw, note: note + 19, amp: 0.7
+    synth :saw, note: note + 24, amp: 0.5
+    synth :saw, note: note + 12.01, amp: 1
+    synth :saw, note: note + 19.02, amp: 0.7
+    synth :saw, note: note + 24.01, amp: 0.5
+  end
+  use_merged_synth_defaults attack: 0
+  synth :tri, note: note + 12, amp: 0.8
+  synth :tri, note: note + 12.02, amp: 0.8
+end
+
+define :synth_pulse do |note|
+  #Davids Fiddle
+  #Pulse Synth
+  synth :pulse, note: note, amp: 1, pulse_width: 0.2
+  synth :pulse, note: note + 0.01, amp: 1, pulse_width: 0.4
+  synth :pulse, note: note + 12, amp: 1, pulse_width: 0.6
+  synth :pulse, note: note + 7, amp: 0.5, pulse_width: 0.8
+end
+
+define :subbass_01 do |note|
+  #Davids Fiddle
+  #Sub Bass
+  synth :sine, note: note, amp: 1
+  synth :sine, note: note + 12, amp: 0.5
+  synth :tri, note: note, amp: 0.4
+end
+
+define :arp_pluck do |note|
+  #Davids Fiddle
+  #Arp Plucks
+  with_fx :reverb do
+    synth :pluck, note: note, amp: 1
+    synth :pluck, note: note - 12, amp: 1
+  end
+end
+
+define :piano_pad do |note|
+  #Davids Fiddle
+  #Piano with strings
+  #WIP
+  synth :piano, note: note, amp: 1.5
+  synth :blade, note: note, attack: 0.15, amp: 0.5
+  synth :blade, note: note, attack: 0.2, amp: 0.5
+  synth :blade, note: note, attack: 0.25, amp: 0.5
+end
+
+define :pad_dirty do |note|
+  #Davids Fiddle
+  #Dirty Pad
+  synth :growl, note: note
+  synth :growl, note: note + 7, amp: 0.5
+  synth :growl, note: note + 12, amp: 0.4
+end
+
+define :pad_space do |note|
+  #Davids Fiddle
+  #Space Pad
+  #Don't go lower than :c3
+  synth :hoover, note: note
+  synth :hoover, note: note + 7, amp: 0.5
+  synth :hoover, note: note + 12, amp: 0.4
+end
+
+define :pad_wind do |note|
+  #Davids Fiddle
+  #Airy Pad
+  synth :hollow, note: note
+  synth :hollow, note: note + 12
+  synth :hollow, note: note + 7, amp: 0.5
 end
