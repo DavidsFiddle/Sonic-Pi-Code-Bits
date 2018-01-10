@@ -11,6 +11,7 @@ define :blueprint do |note|
   #Author
   #Short description
   #Comment
+  use_merged_synth_defaults  #Important to be able to control it from the loop
   synth :sine, note: note
 end
 
