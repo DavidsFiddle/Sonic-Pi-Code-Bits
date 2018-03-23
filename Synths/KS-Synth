@@ -1,29 +1,38 @@
 #Karplus-Strong Synth
 #Coded by Davids Fiddle
-#v0.5
+#v0.8
 
 #To Do:
-#Testing!
-#Comments
-#Cleanup
+#More Testing!
+#More FX 0.9
 
 #Variables for voices:
+#Transposition for the voices
 trans0 = 0
 trans1 = 12
 trans2 = 0
 trans3 = 12
+#Volume for the voices
 amp0 = 1
 amp1 = 1
 amp2 = 0.7
 amp3 = 0.5
+#Synth for the voices
 syn0 = :piano
 syn1 = :piano
 syn2 = :pluck
 syn3 = :pluck
+#Release time for the other synths
+#Update is in the FX loop
+rel = 0.5
+att = 0
+
+
 
 #Preset Section
 live_loop :presets do
   key,vel = sync "/midi/apc_key_25/0/1/note_on"
+  #Every key triggers a different preset
   if key == 64
     #Initial Sound
     trans0 = 0
@@ -81,19 +90,19 @@ live_loop :presets do
     syn2 = :pluck
     syn3 = :pluck
   elsif key == 68
-    #Stacked 3s
+    #Synths
     trans0 = 0
-    trans1 = 4
-    trans2 = 7
-    trans3 = 11
+    trans1 = 0
+    trans2 = 12
+    trans3 = 7
     amp0 = 1
     amp1 = 0.9
     amp2 = 0.8
-    amp3 = 0.7
-    syn0 = :pluck
-    syn1 = :pluck
-    syn2 = :pluck
-    syn3 = :pluck
+    amp3 = 0.5
+    syn0 = :saw
+    syn1 = :tri
+    syn2 = :saw
+    syn3 = :saw
   elsif key == 69
     #Empty
   elsif key == 70
@@ -106,6 +115,7 @@ end
 #FX Section
 with_fx :reverb, mix: 0, room: 0.1 do |verb|
   with_fx :echo, mix: 0, phase: 1, decay: 8 do |echo|
+    #This loop handles the fx controls
     live_loop :con_fx do
       key,val = sync "/midi/*/*/*/control_change"
       if key == 52
@@ -116,12 +126,16 @@ with_fx :reverb, mix: 0, room: 0.1 do |verb|
         control verb, mix: val / 128.0
       elsif key == 55
         control echo, room: val / 128.0
+      elsif key == 48
+        att = val / 128.0
+      elsif key == 49
+        rel = val / 128.0
       end
     end
     live_loop :voices do
+      use_synth_defaults sustain: 0, release: rel, attack: att
       use_real_time
-      #key,vel = sync "/midi/*/*/2/note_on"
-      key,vel = sync "/midi/digital_keyboard/*/*/note_on"
+      key,vel = sync "/midi/*/*/2/note_on"  #Listen for any MIDI-on message
       if vel != 0
         synth syn0, note: key + trans0, amp: amp0
         synth syn1, note: key + trans1, amp: amp1
