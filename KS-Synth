@@ -1,0 +1,133 @@
+#Karplus-Strong Synth
+#Coded by Davids Fiddle
+#v0.5
+
+#To Do:
+#Testing!
+#Comments
+#Cleanup
+
+#Variables for voices:
+trans0 = 0
+trans1 = 12
+trans2 = 0
+trans3 = 12
+amp0 = 1
+amp1 = 1
+amp2 = 0.7
+amp3 = 0.5
+syn0 = :piano
+syn1 = :piano
+syn2 = :pluck
+syn3 = :pluck
+
+#Preset Section
+live_loop :presets do
+  key,vel = sync "/midi/apc_key_25/0/1/note_on"
+  if key == 64
+    #Initial Sound
+    trans0 = 0
+    trans1 = 12
+    trans2 = 0
+    trans3 = 12
+    amp0 = 1
+    amp1 = 1
+    amp2 = 0.7
+    amp3 = 0.5
+    syn0 = :piano
+    syn1 = :piano
+    syn2 = :pluck
+    syn3 = :pluck
+  elsif key == 65
+    #Only Plucks
+    trans0 = 0
+    trans1 = 12
+    trans2 = 7
+    trans3 = 0
+    amp0 = 1
+    amp1 = 1
+    amp2 = 0.7
+    amp3 = 0.5
+    syn0 = :pluck
+    syn1 = :pluck
+    syn2 = :pluck
+    syn3 = :pluck
+  elsif key == 66
+    #Only Piano
+    trans0 = 0
+    trans1 = 12
+    trans2 = -12
+    trans3 = 0
+    amp0 = 1
+    amp1 = 1
+    amp2 = 0.7
+    amp3 = 0.5
+    syn0 = :piano
+    syn1 = :piano
+    syn2 = :piano
+    syn3 = :piano
+  elsif key == 67
+    #Sus4
+    trans0 = 0
+    trans1 = 5
+    trans2 = 7
+    trans3 = 12
+    amp0 = 1
+    amp1 = 0.8
+    amp2 = 1
+    amp3 = 1
+    syn0 = :pluck
+    syn1 = :pluck
+    syn2 = :pluck
+    syn3 = :pluck
+  elsif key == 68
+    #Stacked 3s
+    trans0 = 0
+    trans1 = 4
+    trans2 = 7
+    trans3 = 11
+    amp0 = 1
+    amp1 = 0.9
+    amp2 = 0.8
+    amp3 = 0.7
+    syn0 = :pluck
+    syn1 = :pluck
+    syn2 = :pluck
+    syn3 = :pluck
+  elsif key == 69
+    #Empty
+  elsif key == 70
+    #Empty
+  elsif key == 71
+    #Empty
+  end
+end
+
+#FX Section
+with_fx :reverb, mix: 0, room: 0.1 do |verb|
+  with_fx :echo, mix: 0, phase: 1, decay: 8 do |echo|
+    live_loop :con_fx do
+      key,val = sync "/midi/*/*/*/control_change"
+      if key == 52
+        control echo, mix: val / 128.0
+      elsif key == 53
+        control echo, phase: val / 64.0 + 0.05
+      elsif key == 54
+        control verb, mix: val / 128.0
+      elsif key == 55
+        control echo, room: val / 128.0
+      end
+    end
+    live_loop :voices do
+      use_real_time
+      #key,vel = sync "/midi/*/*/2/note_on"
+      key,vel = sync "/midi/digital_keyboard/*/*/note_on"
+      if vel != 0
+        synth syn0, note: key + trans0, amp: amp0
+        synth syn1, note: key + trans1, amp: amp1
+        synth syn2, note: key + trans2, amp: amp2
+        synth syn3, note: key + trans3, amp: amp3
+      end
+    end
+  end
+end
