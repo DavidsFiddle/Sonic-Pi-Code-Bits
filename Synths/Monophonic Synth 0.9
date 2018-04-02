@@ -1,0 +1,112 @@
+#Monophonic Synth
+#Coded by Davids Fiddle
+#v0.9
+
+#A monophonic instrument with five synth voices and one noise channel
+
+#To Do:
+#Testing!
+#Look for a cool and nerdy name
+
+#Midi adress to use.
+#To specify a device or channel.
+midi_on = "/midi/*/*/2/note_on"
+midi_off = "/midi/*/*/2/note_off"
+#Synth Variables:
+#Amplitude of the voices
+amp0 = 1
+amp1 = 1
+amp2 = 1
+amp3 = 0.8
+amp4 = 0.6
+ampn = 0
+#Transposition of the voices in semitones, float for fine tuning.
+trans0 = 0
+trans1 = 0.1
+trans2 = 0.2
+trans3 = -0.1
+trans4 = 0
+transn = 12
+#Synth sources to use for the voices. Can be any supported synth, including externals.
+synth0 = :saw
+synth1 = :saw
+synth2 = :saw
+synth3 = :tri
+synth4 = :square
+synthn = :noise  #Noise channel
+#Values for all synth voices
+att = 0.1  #Attack time in seconds
+dec = 0.2  #Decay time  -- || --
+l_sus = 0.7  #Relative amplitude after decay time
+pwd = 0.2  #Pulse width for the :pulse synth
+res = 0.99  #Resonance for some synths
+
+#Loops for handling the note_on & note_off events.
+#They send an internal message to the synth voice to communicate the key value and if it was a key press or release.
+live_loop :on do
+  key,vel = sync midi_on
+  cue 'event', 1, key
+end  #:on
+live_loop :off do
+  key,vel = sync midi_off
+  cue 'event', 0, key
+end  #:off
+
+#Initialising the synth voices
+v0 = ()
+v1 = ()
+v2 = ()
+v3 = ()
+v4 = ()
+vn = ()
+with_fx :compressor, mix: 1 do  #To avoid clipping. Turn the mix to 0 of you don't want it.
+  #The main synth loop
+  live_loop :voice do
+    #Don't use timing guarantees.
+    use_real_time
+    #Listening to the cue coming from the in/out loops
+    state,key = sync 'event'
+    #puts state  #Debug Option
+    #State == 1 means a key was pressed.
+    if state == 1
+      #puts 'on'  #Debug Option
+      #Kill the playing synth.
+      #If there isn't one, this step is skipped.
+      kill v0
+      kill v1
+      kill v2
+      kill v3
+      kill v4
+      kill vn
+      #Look for the last key press and take its note value.
+      #This counters a timing problem where hitting keys in short intervals lead to 'sticky keys'(the note would keep playing because of a race condition between a sync and the current_note variable.)
+      note,v = get "/midi/apc_key_25/0/2/note_on"
+      #Set the values that influence all voices.
+      use_synth_defaults sustain: 300, sustain_level: l_sus, attack: att, decay: dec, pulse_width: pwd, res: res
+      #Call the individual voices with a synth source, a transpose value and an amp value
+      v0 = synth synth0, note: note + trans0, amp: amp0
+      v1 = synth synth1, note: note + trans1, amp: amp1
+      v2 = synth synth2, note: note + trans2, amp: amp2
+      v3 = synth synth3, note: note + trans3, amp: amp3
+      v4 = synth synth4, note: note + trans4, amp: amp4
+      vn = synth synthn, cutoff: note + transn, amp: ampn
+      #Remember the currently played note. Using the timestate for this eliminates a race condition.
+      set 'current', note
+      #State == 0 means a key was released.
+    elsif state == 0
+      #Read the currently played note from the timestate.
+      note = get 'current'
+      #Check if the released key is the current note.
+      if key == note
+        #puts 'off'  #Debug Option
+        #Kill the playing synths.
+        kill v0
+        kill v1
+        kill v2
+        kill v3
+        kill v4
+        kill vn
+      end
+    end
+  end  #:voice
+end #:compressor
