@@ -2,7 +2,6 @@ n = :a5
 
 live_loop :morse do
   use_bpm 120
-  n = :a4
   play_morse_text "hello world"
   sleep 3
 end
