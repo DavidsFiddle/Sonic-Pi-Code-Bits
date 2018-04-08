@@ -1,3 +1,11 @@
+live_loop :morse do
+  use_bpm 120
+  n = :a4
+  play_morse_text "hello world"
+  sleep 3
+end
+
+
 #Play Morsecode
 define :play_morse do |letter, note|
   l = 0.6
@@ -9,7 +17,7 @@ define :play_morse do |letter, note|
   when 'd' then [l,s,s]
   when 'e' then [s]
   when 'f' then [s,s,l,s]
-  when 'g' then [e,l,s]
+  when 'g' then [s,l,s]
   when 'h' then [s,s,s,s]
   when 'i' then [s,s]
   when 'j' then [s,e,l,l]
@@ -35,10 +43,12 @@ define :play_morse do |letter, note|
 end
 
 define :play_morse_text do |text|
-  use_synth :beep
-  use_synth_defaults release: 0.2
+  use_synth :blade
+  use_synth_defaults release: 0.2, amp: 2
   for x in (range 0,text.length) do
-      play_morse text[x],:a5
+      play_morse text[x],n if text[x] != ' '
+      sleep 0.6 if text[x] == ' '
       sleep 0.6
     end
   end
+  
