@@ -1,3 +1,5 @@
+n = :a5
+
 live_loop :morse do
   use_bpm 120
   n = :a4
