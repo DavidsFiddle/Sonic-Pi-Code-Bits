@@ -1,0 +1,16 @@
+#Industrial Beat
+#Coded by Davids Fiddle
+
+use_sample_bpm :loop_industrial
+with_fx :compressor do
+  live_loop :drums do
+    sample :loop_industrial
+    sleep 1
+  end
+  live_loop :kik do
+    sample :bd_haus if one_in(2)
+    sleep 0.125
+    sample :bd_haus if one_in(4)
+    sleep 0.125
+  end
+end
