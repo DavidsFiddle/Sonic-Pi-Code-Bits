@@ -1,0 +1,15 @@
+#Rhodes Sound
+#Coded by Davids Fiddle
+
+define :rhodes do |note|
+  with_fx :compressor do
+    with_fx :flanger, phase_offset: 0.8, mix: 1 do
+      synth :sine, note: note, decay: 0.25, sustain_level: 0.8, release: 0.5
+    end
+    with_fx :rlpf, cutoff: note + 12 do
+      use_merged_synth_defaults decay: 0.25, sustain_level: 0.7, release: 0.25, sustain: 0
+      synth :tri, note: note, amp: 0.5
+      synth :tri, note: note + 12, amp: 0.7
+    end
+  end
+end
