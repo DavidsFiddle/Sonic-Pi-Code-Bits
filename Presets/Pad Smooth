@@ -1,0 +1,14 @@
+define :pad_smooth do |note|
+  use_merged_synth_defaults attack: 0.2
+  with_fx :hpf, cutoff: note do
+    with_fx :lpf, cutoff: note + 24 do
+      with_fx :compressor do
+        synth :tri, note: note + 0, pan: 0.1
+        synth :tri, note: note + 12.02, pan: 0.2
+        synth :saw, note: note + 0.02, pan: -0.1
+        synth :sine, note: note + 12, pan: -0.2
+        synth :sine, note: note, pan: 0
+      end
+    end
+  end
+end
