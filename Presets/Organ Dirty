@@ -1,0 +1,22 @@
+define :organ_dirty do |note|
+  use_merged_synth_defaults attack: 0.1
+  with_fx :compressor do
+    with_fx :reverb, room: 0.3 do
+      synth :square, note: note, amp: 1
+      synth :square, note: note - 0.01, amp: 1
+      synth :saw, note: note + 12, amp: 0.8
+      synth :saw, note: note - 12, amp: 0.4
+    end
+    with_fx :reverb, room: 0.5 do
+      synth :saw, note: note + 12, amp: 1
+      synth :saw, note: note + 19, amp: 0.7
+      synth :saw, note: note + 24, amp: 0.5
+      synth :saw, note: note + 12.01, amp: 1
+      synth :saw, note: note + 18.99, amp: 0.7
+      synth :saw, note: note + 24.01, amp: 0.5
+    end
+    use_merged_synth_defaults attack: 0
+    synth :square, note: note + 12, amp: 0.8
+    synth :square, note: note + 11.99, amp: 0.8
+  end
+end
