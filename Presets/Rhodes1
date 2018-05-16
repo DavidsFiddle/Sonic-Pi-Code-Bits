@@ -1,7 +1,4 @@
-#Rhodes Sound
-#Coded by Davids Fiddle
-
-define :rhodes do |note|
+define :rhodes1 do |note|
   with_fx :compressor do
     with_fx :flanger, phase_offset: 0.8, mix: 1 do
       synth :sine, note: note, decay: 0.25, sustain_level: 0.8, release: 0.5
