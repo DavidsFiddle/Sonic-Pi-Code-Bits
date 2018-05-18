@@ -1,0 +1,58 @@
+#Stasis
+#Coded by Davids Fiddle
+
+c0 = 0
+c1 = 0
+c2 = 0
+c3 = 0
+a0 = 0
+a1 = 0
+a2 = 0
+a3 = 0
+use_real_time
+
+use_synth_defaults sustain: 600, note: 60, amp: 0
+with_fx :reverb do
+  #Soft
+  v0 = synth :sine
+  v1 = synth :tri
+  #Hard
+  v2 = synth :fm
+  v3 = synth :blade
+  #Harmonic
+  v4 = synth :tb303
+  v5 = synth :tech_saws
+  #Chaotic
+  v6 = synth :dark_ambience
+  v7 = synth :growl
+  
+  #Synth Control
+  live_loop :control do
+    key,val = sync "/midi/*/*/*/control_change"
+    if key == 48
+      a0 = val / 128.0
+    elsif key == 49
+      a1 = val / 128.0
+    elsif key == 50
+      a2 = val / 128.0
+    elsif key == 51
+      a3 = val / 128.0
+    elsif key == 52
+      c0 = val / 128.0
+    elsif key == 53
+      c1 = val / 128.0
+    elsif key == 54
+      c2 = val / 128.0
+    elsif key == 55
+      c3 = val / 128.0
+    end
+    control v0, amp: a0 * c0
+    control v1, amp: a0 * (1 - c0)
+    control v2, amp: a1 * c1
+    control v3, amp: a1 * (1 - c1)
+    control v4, amp: a2 * c2
+    control v5, amp: a2 * (1 - c2)
+    control v6, amp: a3 * c3
+    control v7, amp: a3 * (1 - c3)
+  end
+end
