@@ -14,17 +14,17 @@ use_real_time
 use_synth_defaults sustain: 600, note: 60, amp: 0
 with_fx :reverb do
   #Soft
-  v0 = synth :sine
-  v1 = synth :tri
+  v0 = synth :tri
+  v1 = synth :sine
   #Hard
-  v2 = synth :fm
-  v3 = synth :blade
+  v2 = synth :blade
+  v3 = synth :fm
   #Harmonic
   v4 = synth :tb303
   v5 = synth :tech_saws
   #Chaotic
-  v6 = synth :dark_ambience
-  v7 = synth :growl
+  v6 = synth :growl
+  v7 = synth :dark_ambience
   
   #Synth Control
   live_loop :control do
