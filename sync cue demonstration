@@ -1,0 +1,38 @@
+comment do
+  #The print commands happen at the same time
+  #Run and stop it a few times. The order in which the print commands happen changes.
+  live_loop :test0 do
+    print "t0: " + vt.to_s
+    sleep 1
+  end
+  
+  live_loop :test1 do
+    sync :test0
+    print "t1: " + vt.to_s
+  end
+  
+  live_loop :test2 do
+    sync :test1
+    print "t2: " + vt.to_s
+  end
+end
+
+
+uncomment do
+  #:syn is one behind clock
+  live_loop :clock do
+    puts "clock:  " + tick.to_s
+    sleep 1
+  end
+  
+  live_loop :syn do
+    sync :clock
+    puts "syn_1:  " + tick.to_s  #gets called every beat
+  end
+  
+  live_loop :syn_4 do
+    sync :clock
+    puts "syn4:  " + tick.to_s  #only gets called every 5 beats
+    sleep 4
+  end
+end
