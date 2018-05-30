@@ -1,0 +1,247 @@
+# Created by Tarcan Gul
+
+# Cover: Bob Sinclar - Love Generation
+# Note: Arrangement is not 100% accurate since there is no vocal elements in this cover.
+
+use_bpm 128
+
+#Note lengths
+w = 1
+h = 0.5
+q = 0.25
+s = 0.25/2
+
+#Chords used
+ch1 = [:Cs4,:Gs4,:Cs5,:F5]
+ch2 = [:F3, :Gs4,:Cs5,:F5]
+ch3 = [:Gs3, :Fs4, :As4, :Cs5]
+
+#Sound level booth
+kickLevel = 4
+hatLevel = 0.8
+bassLevel = 0.4
+pianoLevel = 6
+whistleLevel = 2
+backpluckLevel = 3
+
+
+#Chord rhythm and sequence
+define :chords do
+  use_synth :piano
+  use_synth_defaults amp: pianoLevel
+  2.times do
+    play_pattern_timed [ch1,:r,:r ,ch1, :r,:r,ch1,:r,:r,ch1,ch1,ch1,ch1,ch1,:r,:r ], q
+  end
+  1.times do
+    play_pattern_timed [ch2,:r,:r ,ch2, :r,:r,ch2,:r,:r,ch2,ch2,ch2,ch2,ch2,:r,:r ], q
+  end
+  1.times do
+    play_pattern_timed [ch3,:r,:r ,ch3, :r,:r,ch3,:r,:r,ch3,ch3,ch3,ch3,ch3,:r,:r ], q
+  end
+end
+
+#Kickdrum rhythm which is four-on-the-floor pattern
+define :kickdrum do
+  4.times do
+    sample :drum_bass_soft ,release:w, amp: kickLevel
+    sleep w
+  end
+end
+
+#Bassline sequence
+define :bassPart do
+  use_synth :tb303
+  use_synth_defaults amp: bassLevel, release: 0.2
+  4.times do
+    play_pattern_timed [:Cs3, 0,0,:Cs3,0,0,:Gs2,0,:Cs3, 0,0,:Cs3,0,0,:Gs2,0],q
+    play_pattern_timed [:Cs3, 0,0,:Cs3,0,0,:Gs2,0,:Cs3, 0,0,:Cs3,0,0,:Gs2,0],q
+    play_pattern_timed [:F2, 0,0,:F2,0,0,:C3,0,:F2, 0,0,:F2,0,0,:C3,0],q
+    play_pattern_timed [:As2, 0,0,:As2,0,0,:As2,0,:As2, 0,0,:As2,0,0,:As2,0],q
+  end
+end
+
+#Cymbals sequence
+define :cymbals do
+  with_fx :hpf,cutoff:90 do
+    1.times do
+      play sample :drum_cymbal_pedal, amp: hatLevel
+      sleep q
+      play sample :drum_cymbal_pedal, amp: hatLevel
+      sleep q
+      play sample :drum_cymbal_pedal, amp: hatLevel
+      sleep q
+      play sample :drum_cymbal_pedal, amp: hatLevel
+      sleep q
+      play sample :drum_cymbal_pedal, amp: hatLevel
+      sleep q
+      play sample :drum_cymbal_pedal, amp: hatLevel
+      sleep q
+      play sample :drum_cymbal_pedal, amp: hatLevel
+      sleep q
+      play sample :drum_cymbal_pedal, amp: hatLevel
+      sleep q
+      play sample :drum_cymbal_pedal, amp: hatLevel
+      sleep q
+      play sample :drum_cymbal_pedal, amp: hatLevel
+      sleep q
+      play sample :drum_cymbal_pedal, amp: hatLevel
+      sleep q
+      play sample :drum_cymbal_pedal, amp: hatLevel
+      sleep q
+      play sample :drum_cymbal_pedal, amp: hatLevel
+      sleep q
+      play sample :drum_cymbal_pedal, amp: hatLevel
+      sleep q
+      play sample :drum_cymbal_open, amp: hatLevel, release:0.5
+      sleep q
+      play sample :drum_cymbal_pedal, amp: hatLevel
+      sleep q
+    end
+  end
+end
+
+#Sequence and the sound of the main melody
+define :mainMelody do
+  use_synth :saw
+  use_synth_defaults amp: whistleLevel, release: 0.4
+  with_fx :reverb,room:0.7 do
+    1.times do
+      play_pattern_timed [:Cs7,0,0,0,0,0,:F7,:Cs7,0,0,0,0,0,0,0,0],q
+      play_pattern_timed [0,0,:Cs7,0,:C7,0,:Cs7,:Ds7,0,0,:Cs7,0,:C7,0,:F7,0],q
+      play_pattern_timed [:C7,0,0,0,0,0,:F7,:C7,0,0,0,0,0,0,0,0],q
+      play_pattern_timed [:Ds7,0,0,0,0,0,:Ds7,0,:Cs7,0,:Ds7,0,:Cs7,0,:Ds7,0],q
+    end
+  end
+end
+
+#Sequence of the backpluck
+define :backpluck do
+  use_synth :blade
+  use_synth_defaults amp: backpluckLevel, release: 0.4
+  with_fx :hpf, cutoff:50 do
+    with_fx :reverb, room:0.8, damp:1 do
+      2.times do
+        play_pattern_timed [:Cs4,0,0,0,0,0,:Ds4,0,0,0,0,0,:Ds4,0,:F4,0],q
+        play_pattern_timed [:Cs4,0,0,0,0,0,:Ds4,0,0,0,0,0,:Ds4,0,:F4,0],q
+        play_pattern_timed [:C4,0,0,0,0,0,:Ds4,0,0,0,0,0,:Ds4,0,:F4,0],q
+        play_pattern_timed [:Gs3,0,0,0,0,0,:Ds4,0,0,0,0,0,:Ds4,0,:F4,0],q
+      end
+    end
+  end
+end
+
+
+#Sequence of the melody between the chorus
+define :bridge do
+  
+  use_synth :chiplead
+  use_synth_defaults amp: 2, release: 0.5
+  with_fx :reverb, room: 1, damp:1 do
+    
+    1.times do
+      
+      play_pattern_timed [:r,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r],q
+      play_pattern_timed [:Cs4,:r,:Gs4,:Cs4,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r],q
+      play_pattern_timed [:r,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r],q
+      play_pattern_timed [:C4,:r,:Gs4,:Cs4,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r],q
+      play_pattern_timed [:Cs4,:r,:Gs4,:Cs4,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r],q
+      play_pattern_timed [:Cs4,:r,:Gs4,:Cs4,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r],q
+      play_pattern_timed [:r,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r],q
+      play_pattern_timed [:C4,:r,:Gs4,:Cs4,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r,:r],q
+    end
+  end
+  
+end
+
+
+
+#chords arrangement
+in_thread do
+  16.times do
+    chords
+  end
+end
+
+#drums arrangement
+in_thread do
+  2.times do
+    sleep 16
+  end
+  16.times do
+    kickdrum
+  end
+  16.times do
+    kickdrum
+  end
+  1.times do
+    sleep 16
+  end
+  16.times do
+    kickdrum
+  end
+end
+
+#bass arrangement
+in_thread do
+  2.times do
+    sleep 16
+  end
+  4.times do
+    bassPart
+  end
+end
+
+#Arrangement of the chorus melody
+in_thread do
+  4.times do
+    sleep 16
+  end
+  4.times do
+    mainMelody
+  end
+  2.times do
+    sleep 16
+  end
+  4.times do
+    mainMelody
+  end
+end
+
+#Arrangement of the cymbals
+in_thread do
+  3.times do
+    sleep 16
+  end
+  16.times do
+    cymbals
+  end
+  16.times do
+    cymbals
+  end
+  16.times do
+    cymbals
+  end
+end
+
+#Arrangement of the back pluck melody
+in_thread do
+  8.times do
+    backpluck
+  end
+  1.times do
+    backpluck
+  end
+  
+end
+
+#Arrangement of the bridge, which only pops up in the middle of the track.
+in_thread do
+  8.times do
+    sleep 16
+  end
+  1.times do
+    bridge
+  end
+end
+
+
