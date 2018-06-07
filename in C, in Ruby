@@ -1,0 +1,286 @@
+#In C, coded but not in C
+#Coded by Davids Fiddle
+
+use_bpm 100
+use_random_seed 42
+set 'current0',0
+set 'current1',0
+set 'current2',0
+set 'current3',0
+set 'current4',0
+set 'current5',0
+
+#Note times
+w = 4
+dh = 3
+h = 2
+dq = 1.5
+q = 1
+de = 0.75
+e = 0.5
+s = 0.25
+
+#Synths for the players:
+syn0 = :blade
+syn1 = :blade
+syn2 = :blade
+syn3 = :blade
+syn4 = :blade
+syn5 = :blade
+
+atoms = [(ring [:r,q]),
+         (ring [:c4,s],[:e4,de],[:c4,s],[:e4,de],[:c4,s],[:e4,de]),
+         (ring [:c4,s],[:e4,s],[:f4,e],[:e4,q]),
+         (ring [:r,e],[:e4,e],[:f4,e],[:e4,e]),
+         (ring [:r,e],[:e4,e],[:f4,e],[:g4,e]),
+         (ring [:e4,e],[:f4,e],[:g4,e],[:r,e]),  #5
+         (ring [:c5,2*w]),
+         (ring [:r,dh],[:r,e],[:c4,s],[:c4,s],[:c4,e],[:r,e],[:r,w]),
+         (ring [:g4,dh],[:f4,2*w]),
+         (ring [:b4,s],[:g4,s],[:r,e],[:r,dh]),
+         (ring [:b4,s],[:g4,s]),  #10
+         (ring [:f4,s],[:g4,s],[:b4,s],[:g4,s],[:b4,s],[:g4,s]),
+         (ring [:f4,e],[:g4,e],[:b4,w],[:c5,q]),
+         (ring [:a4,s],[:f4,de],[:g4,s],[:f4,s],[:g4,e],[:r,de],[:g4,s+dh]),
+         (ring [:c5,w],[:b4,w],[:g4,w],[:fs4,w]),
+         (ring [:g4,s],[:r,de],[:r,dh]),  #15
+         (ring [:g4,s],[:a4,s],[:c5,s],[:b4,s]),
+         (ring [:b4,s],[:c5,s],[:b4,s],[:c5,s],[:b4,s],[:r,s]),
+         (ring [:e4,s],[:fs4,s],[:e4,s],[:fs4,s],[:e4,de],[:e4,s]),
+         (ring [:r,dq],[:g5,dq]),
+         (ring [:e4,s],[:fs4,s],[:e4,s],[:fs4,s],[:g3,de],[:e4,s],[:fs4,s],[:e4,s],[:fs4,s],[:e4,s]),  #20
+         (ring [:fs4,dh]),
+         (ring [:e4,dq],[:e4,dq],[:e4,dq],[:e4,dq],[:e4,dq],[:fs4,dq],[:g4,dq],[:a4,dq],[:b4,e]),
+         (ring [:e4,e],[:fs4,dq],[:fs4,dq],[:fs4,dq],[:fs4,dq],[:fs4,dq],[:g4,dq],[:a4,dq],[:b4,q]),
+         (ring [:d4,e],[:fs4,e],[:g4,dq],[:g4,dq],[:g4,dq],[:g4,dq],[:g4,dq],[:a4,dq],[:a4,e]),
+         (ring [:e4,e],[:fs4,e],[:g4,e],[:a4,dq],[:a4,dq],[:a4,dq],[:a4,dq],[:a4,dq],[:b4,dq],),  #25
+         (ring [:e4,e],[:fs4,e],[:g4,e],[:a4,e],[:b4,dq],[:b4,dq],[:b4,dq],[:b4,dq],[:b4,dq]),
+         (ring [:e4,s],[:fs4,s],[:e4,s],[:fs4,s],[:g4,e],[:e4,s],[:g4,s],[:fs4,s],[:e4,s],[:fs4,s],[:e4,s]),
+         (ring [:e4,s],[:fs4,s],[:e4,s],[:fs4,s],[:e4,de],[:e4,s]),
+         (ring [:e4,dh],[:g4,dh],[:c5,dh]),
+         (ring [:c5,w+h]),  #30
+         (ring [:g4,s],[:f4,s],[:g4,s],[:b4,s],[:g4,s],[:b4,s]),
+         (ring [:f4,s],[:g4,s],[:f4,s],[:g4,s],[:b4,s],[:f4,s+dh],[:g4,dq]),
+         (ring [:g4,s],[:f4,s],[:r,e]),
+         (ring [:g4,s],[:f4,s]),
+         (ring [:f4,s],[:g4,s],[:b4,s],[:g4,s],[:b4,s],[:g4,s],[:b4,s],[:g4,s],[:b4,s],[:g4,s],[:r,e+dh], [:bb4,q],[:g5,dh],[:a5,e],[:g5,q],[:b5,e],[:a5,dq],[:g5,e],[:e5,dh],[:g5,e],[:fs5,e+dh],[:r,h+e],[:e5,e+h],[:f5,w]),  #35
+         (ring [:f4,s],[:g4,s],[:b4,s],[:g4,s],[:b4,s],[:g4,s]),
+         (ring [:f4,s],[:g4,s]),
+         (ring [:f4,s],[:g4,s],[:b4,s]),
+         (ring [:b4,s],[:g4,s],[:f4,s],[:g4,s],[:b4,s],[:c5,s]),
+         (ring [:b4,s],[:f4,s]),  #40
+         (ring [:b4,s],[:g4,s]),
+         (ring [:c5,w],[:b4,w],[:a4,w],[:c5,w]),
+         (ring [:f5,s],[:e5,s],[:f5,s],[:e5,s],[:e5,e],[:e5,e],[:e5,e],[:f5,s],[:e5,s]),
+         (ring [:f5,e],[:e5,q],[:e5,e],[:c5,q]),
+         (ring [:d5,q],[:d5,q],[:g4,q]),  #45
+         (ring [:g4,s],[:d5,s],[:e5,s],[:d5,s],[:r,e],[:g4,e],[:r,e],[:g4,e],[:r,e],[:g4,e],[:g4,s],[:d5,s],[:e5,s],[:d5,s]),
+         (ring [:d5,s],[:e5,s],[:d5,e]),
+         (ring [:g4,w+h],[:g4,w],[:f4,w+q]),
+         (ring [:f4,s],[:g4,s],[:bb4,s],[:g4,s],[:bb4,s],[:g4,s]),
+         (ring [:f4,s],[:g4,s]),  #50
+         (ring [:f4,s],[:g4,s],[:bb4,s]),
+         (ring [:g4,s],[:bb4,s]),
+         (ring [:bb4,s],[:g4,s]),
+         (ring [:r,q])]
+
+
+with_fx :reverb do
+  live_loop :metronome do
+    use_synth :pretty_bell
+    c0 = get 'current0'
+    c1 = get 'current1'
+    c2 = get 'current2'
+    c3 = get 'current3'
+    c4 = get 'current4'
+    c5 = get 'current5'
+    stop if [c0,c1,c2,c3,c4,c5].min == 54
+    play :c6
+    sleep q
+  end
+  
+  current0 = 0
+  live_loop :player_0 do
+    use_synth syn0
+    c1 = get 'current1'
+    c2 = get 'current2'
+    c3 = get 'current3'
+    c4 = get 'current4'
+    c5 = get 'current5'
+    if [c1,c2,c3,c4,c5].min <= current0 - 3
+      #Don't advance
+      current0 = current0
+      puts "0 stays"
+    elsif [c1,c2,c3,c4,c5].max >= current0 + 3
+      #Always advance
+      current0 = current0 + 1
+      puts "0 advances"
+    else
+      #Flip a coin
+      current0 = current0 + (ring 0,0,0,1).choose
+      puts "0 chooses"
+    end
+    stop if current0 == 54  #End condition
+    puts current0  #Debug
+    set 'current0', current0  #Communicate with other players
+    for n in atoms[current0]
+      puts n  #Debug
+      play n[0]
+      sleep n[1]
+    end
+  end
+  
+  current1 = 0
+  live_loop :player_1 do
+    use_synth syn1
+    c1 = get 'current0'
+    c2 = get 'current2'
+    c3 = get 'current3'
+    c4 = get 'current4'
+    c5 = get 'current5'
+    if [c1,c2,c3,c4,c5].min <= current1 - 3
+      #Don't advance
+      current1 = current1
+      puts "1 stays"
+    elsif [c1,c2,c3,c4,c5].max >= current1 + 3
+      #Always advance
+      current1 = current1 + 1
+      puts "1 advances"
+    else
+      #Flip a coin
+      current1 = current1 + (ring 0,0,0,1).choose
+      puts "1 chooses"
+    end
+    stop if current1 == 54  #End condition
+    puts current1  #Debug
+    set 'current1', current1  #Communicate with other players
+    for n in atoms[current1]
+      puts n  #Debug
+      play n[0]
+      sleep n[1]
+    end
+  end
+  
+  current2 = 0
+  live_loop :player_2 do
+    use_synth syn2
+    c1 = get 'current1'
+    c2 = get 'current0'
+    c3 = get 'current3'
+    c4 = get 'current4'
+    c5 = get 'current5'
+    if [c1,c2,c3,c4,c5].min <= current2 - 3
+      #Don't advance
+      current2 = current2
+      puts "2 stays"
+    elsif [c1,c2,c3,c4,c5].max >= current2 + 3
+      #Always advance
+      current2 = current2 + 1
+      puts "2 advances"
+    else
+      #Flip a coin
+      current2 = current2 + (ring 0,0,0,1).choose
+      puts "2 chooses"
+    end
+    stop if current2 == 54  #End condition
+    puts current2  #Debug
+    set 'current2', current2  #Communicate with other players
+    for n in atoms[current2]
+      puts n  #Debug
+      play n[0]
+      sleep n[1]
+    end
+  end
+  
+  current3 = 0
+  live_loop :player_3 do
+    use_synth syn3
+    c1 = get 'current1'
+    c2 = get 'current2'
+    c3 = get 'current0'
+    c4 = get 'current4'
+    c5 = get 'current5'
+    if [c1,c2,c3,c4,c5].min <= current3 - 3
+      #Don't advance
+      current3 = current3
+      puts "3 stays"
+    elsif [c1,c2,c3,c4,c5].max >= current3 + 3
+      #Always advance
+      current3 = current3 + 1
+      puts "3 advances"
+    else
+      #Flip a coin
+      current3 = current3 + (ring 0,0,0,1).choose
+      puts "3 chooses"
+    end
+    stop if current3 == 54  #End condition
+    puts current3  #Debug
+    set 'current3', current3  #Communicate with other players
+    for n in atoms[current3]
+      puts n  #Debug
+      play n[0]
+      sleep n[1]
+    end
+  end
+  current4 = 0
+  live_loop :player_4 do
+    use_synth syn4
+    c1 = get 'current1'
+    c2 = get 'current2'
+    c3 = get 'current3'
+    c4 = get 'current0'
+    c5 = get 'current5'
+    if [c1,c2,c3,c4,c5].min <= current4 - 3
+      #Don't advance
+      current4 = current4
+      puts "4 stays"
+    elsif [c1,c2,c3,c4,c5].max >= current4 + 3
+      #Always advance
+      current4 = current4 + 1
+      puts "4 advances"
+    else
+      #Flip a coin
+      current4 = current4 + (ring 0,0,0,1).choose
+      puts "4 chooses"
+    end
+    stop if current4 == 54  #End condition
+    puts current4  #Debug
+    set 'current4', current4  #Communicate with other players
+    for n in atoms[current4]
+      puts n  #Debug
+      play n[0]
+      sleep n[1]
+    end
+  end
+  
+  current5 = 0
+  live_loop :player_5 do
+    use_synth syn5
+    c1 = get 'current1'
+    c2 = get 'current2'
+    c3 = get 'current3'
+    c4 = get 'current4'
+    c5 = get 'current0'
+    if [c1,c2,c3,c4,c5].min <= current5 - 3
+      #Don't advance
+      current5 = current5
+      puts "5 stays"
+    elsif [c1,c2,c3,c4,c5].max >= current5 + 3
+      #Always advance
+      current5 = current5 + 1
+      puts "5 advances"
+    else
+      #Flip a coin
+      current5 = current5 + (ring 0,0,0,1).choose
+      puts "5 chooses"
+    end
+    stop if current5 == 54  #End condition
+    puts current5  #Debug
+    set 'current5', current5  #Communicate with other players
+    for n in atoms[current5]
+      puts n  #Debug
+      play n[0]
+      sleep n[1]
+    end
+  end
+end
