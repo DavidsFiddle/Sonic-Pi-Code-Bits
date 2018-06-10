@@ -10,8 +10,10 @@ a1 = 0
 a2 = 0
 a3 = 0
 use_real_time
+root = :a3
+harm = (chord root, '7sus4', num_octaves: 2)
 
-use_synth_defaults sustain: 600, note: 60, amp: 0
+use_synth_defaults sustain: 600, note: root, amp: 0
 with_fx :reverb do
   #Soft
   v0 = synth :tri
@@ -27,7 +29,7 @@ with_fx :reverb do
   v7 = synth :dark_ambience
   
   #Synth Control
-  live_loop :control do
+  live_loop :control_knobs do
     key,val = sync "/midi/*/*/*/control_change"
     if key == 48
       a0 = val / 128.0
@@ -46,13 +48,26 @@ with_fx :reverb do
     elsif key == 55
       c3 = val / 128.0
     end
-    control v0, amp: a0 * c0
-    control v1, amp: a0 * (1 - c0)
-    control v2, amp: a1 * c1
-    control v3, amp: a1 * (1 - c1)
-    control v4, amp: a2 * c2
-    control v5, amp: a2 * (1 - c2)
-    control v6, amp: a3 * c3
-    control v7, amp: a3 * (1 - c3)
+    control v0, amp: a0 * (1 - c0)
+    control v1, amp: a0 * c0
+    control v2, amp: a1 * (1 - c1)
+    control v3, amp: a1 * c1
+    control v4, amp: a2 * (1 - c2)
+    control v5, amp: a2 * c2
+    control v6, amp: a3 * (1 - c3)
+    control v7, amp: a3 * c3
+  end
+  live_loop :control_pads do
+    key,vel = sync "/midi/apc_key_25/0/1/note_on"
+    if key <= 40
+      control v0, note: harm[key / 8] if key % 8 == 0
+      control v1, note: harm[key / 8] if key % 8 == 1
+      control v2, note: harm[key / 8] if key % 8 == 2
+      control v3, note: harm[key / 8] if key % 8 == 3
+      control v4, note: harm[key / 8] if key % 8 == 4
+      control v5, note: harm[key / 8] if key % 8 == 5
+      control v6, note: harm[key / 8] if key % 8 == 6
+      control v7, note: harm[key / 8] if key % 8 == 7
+    end
   end
 end
