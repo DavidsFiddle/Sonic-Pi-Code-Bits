@@ -1,0 +1,204 @@
+//Euclidian Rhythm
+//Coded by Davids Fiddle
+//v1.0
+
+import oscP5.*;                   //Needs oscP5 and controlP5 libraries
+import netP5.*;                   
+import controlP5.*;
+
+OscP5 oscP5;                      //Communication
+NetAddress sonicPi;               //where the messages go
+ControlP5 cp5;                    //Interface
+
+boolean enableComms = true;
+
+PFont pfont12, pfont15, pfont20;
+
+void setup() {
+
+  size(600, 600, P3D);  //set up window
+  smooth();    
+  //Network adress to communicate with Sonic Pi
+  oscP5 = new OscP5(this, 8000);                  
+  sonicPi = new NetAddress("127.0.0.1", 4559);
+  //Creating Fonts
+  pfont20 = createFont("Georgia", 20, true);
+  pfont15 = createFont("Georgia", 15, true);
+  pfont12 = createFont("Georgia", 12, true);
+
+  createUI();                              
+  enableComms = true;
+}
+
+//Methods for sending key/value to Sonic Pi
+void sendOsc(String name, int value) {
+  OscMessage toSend = new OscMessage("/" + name);
+  toSend.add((int)value);
+  oscP5.send(toSend, sonicPi);
+}
+void sendOsc(String name, float value) {
+  OscMessage toSend = new OscMessage("/" + name);
+  toSend.add((float)value);
+  oscP5.send(toSend, sonicPi);
+}
+void sendOsc(String name, String value) {
+  OscMessage toSend = new OscMessage("/" + name);
+  toSend.add((String)value);
+  oscP5.send(toSend, sonicPi);
+}
+
+//fill in the Background
+void draw() {
+  background(30);
+  drawBackground();
+}
+
+//Draw all lines
+void drawBackground() {
+  background(0);
+  stroke(255);
+  //Title Box:
+  line(0, 100, 300, 100);
+  line(300, 0, 300, 100);
+  //Credit Box:
+  line(400, 0, 400, 100);
+  line(400, 100, 600, 100);
+  //Voice Boxes:
+  line(0, 200, 200, 200);
+  line(400, 200, 600, 200);
+  line(0, 400, 600, 400);
+  line(200, 200, 200, 600);
+  line(400, 200, 400, 600);
+}
+
+void createUI() {
+  //Initialising Fonts
+  ControlFont fontl = new ControlFont(pfont20);
+  ControlFont fontm = new ControlFont(pfont15);
+  ControlFont fonts = new ControlFont(pfont12);
+
+  //create canvas for the controls
+  cp5 = new ControlP5(this);
+
+  //Labels:
+  cp5.addTextlabel("title").setText("Euclidian Rhythm \nby Davids Fiddle").setPosition(25, 25).setFont(fontl);
+  cp5.addTextlabel("thanks").setText("Running with Sonic Pi\nby Sam Aaron\nand Processing 3\nby Ben Fry and Casey Reas").setPosition(425, 25).setFont(fonts);
+  cp5.addTextlabel("Version").setText("v1.0").setPosition(250, 75).setFont(fonts);
+  //cp5.addTextlabel("howTo").setText("The Euclidian Rhythm spreads trigger events \nacross different bar lengths. Rotate offsets the triggers by n beats. \nYou can control wave source for the drums \nand noise source for the cymbals. \nYou can also control pitch, falloff and release for all pieces. \nBPM, Amp and Cut are applied to all pieces. \nThe Euclidian Rhythm sends out an internal timer message: \n'ER_clock', so you can sync to it.").setPosition(525, 125).setFont(fontm);
+
+
+  //Global Variables:
+  cp5.addKnob("bpm").setRange(6, 240).setValue(60).setPosition(525, 125).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("BPM").setDecimalPrecision(1).setFont(fonts);
+  cp5.addKnob("vol").setRange(0, 1).setValue(1).setPosition(25, 125).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("AMP").setDecimalPrecision(1).setFont(fonts);
+  cp5.addKnob("verb").setRange(0, 1).setValue(0).setPosition(125, 125).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("REVERB").setDecimalPrecision(2).setFont(fonts);
+  cp5.addKnob("cut").setRange(10, 127).setValue(127).setPosition(225, 125).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("CUT").setDecimalPrecision(1).setFont(fonts);
+  //Bank selection
+  cp5.addRadioButton("bank").setPosition(225, 225).setItemsPerRow(2).setItemWidth(74).setItemHeight(49).addItem("Bank 0", 0).addItem("Bank 1", 1).addItem("Bank 2", 2).addItem("Bank 3", 3).addItem("Bank 4", 4).addItem("Bank 5", 5).align(CENTER, CENTER).activate(0).setNoneSelectedAllowed(false);
+  //Each piece has four knobs, controlling sequence length, spread, offset and sample rate.  
+  //Kick
+  cp5.addKnob("len0").setRange(1, 32).setValue(8).setPosition(25, 225).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("length_kick").setDecimalPrecision(1).setFont(fonts);
+  cp5.addKnob("spr0").setRange(0, 32).setValue(2).setPosition(125, 225).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("spread_kick").setDecimalPrecision(1).setFont(fonts);
+  cp5.addKnob("rot0").setRange(0, 32).setValue(0).setPosition(25, 325).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("offset_kick").setDecimalPrecision(1).setFont(fonts);
+  cp5.addKnob("rte0").setRange(0.2, 2).setValue(1).setPosition(125, 325).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("rate_kick").setDecimalPrecision(2).setFont(fonts);
+  //Snare
+  cp5.addKnob("len1").setRange(1, 32).setValue(8).setPosition(25, 425).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("length_snare").setDecimalPrecision(1).setFont(fonts);
+  cp5.addKnob("spr1").setRange(0, 32).setValue(2).setPosition(125, 425).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("spread_snare").setDecimalPrecision(1).setFont(fonts);
+  cp5.addKnob("rot1").setRange(0, 32).setValue(2).setPosition(25, 525).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("offset_snare").setDecimalPrecision(1).setFont(fonts);
+  cp5.addKnob("rte1").setRange(0.2, 2).setValue(1).setPosition(125, 525).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("rate_snare").setDecimalPrecision(2).setFont(fonts);
+  //Tom
+  cp5.addKnob("len2").setRange(1, 32).setValue(8).setPosition(225, 425).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("length_misc").setDecimalPrecision(1).setFont(fonts);
+  cp5.addKnob("spr2").setRange(0, 32).setValue(0).setPosition(325, 425).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("spread_misc").setDecimalPrecision(1).setFont(fonts);
+  cp5.addKnob("rot2").setRange(0, 32).setValue(0).setPosition(225, 525).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("offset_misc").setDecimalPrecision(1).setFont(fonts);
+  cp5.addKnob("rte2").setRange(0.2, 2).setValue(1).setPosition(325, 525).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("rate_misc").setDecimalPrecision(2).setFont(fonts);
+  //Hat1
+  cp5.addKnob("len3").setRange(1, 32).setValue(8).setPosition(425, 225).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("length_hat1").setDecimalPrecision(1).setFont(fonts);
+  cp5.addKnob("spr3").setRange(0, 32).setValue(0).setPosition(525, 225).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("spread_hat1").setDecimalPrecision(1).setFont(fonts);
+  cp5.addKnob("rot3").setRange(0, 32).setValue(0).setPosition(425, 325).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("offset_hat1").setDecimalPrecision(1).setFont(fonts);
+  cp5.addKnob("rte3").setRange(0.2, 2).setValue(1).setPosition(525, 325).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("rate_hat1").setDecimalPrecision(2).setFont(fonts);
+  //Hat2
+  cp5.addKnob("len4").setRange(1, 32).setValue(8).setPosition(425, 425).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("length_hat2").setDecimalPrecision(1).setFont(fonts);
+  cp5.addKnob("spr4").setRange(0, 32).setValue(0).setPosition(525, 425).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("spread_hat2").setDecimalPrecision(1).setFont(fonts);
+  cp5.addKnob("rot4").setRange(0, 32).setValue(0).setPosition(425, 525).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("offset_hat2").setDecimalPrecision(1).setFont(fonts);
+  cp5.addKnob("rte4").setRange(0.2, 2).setValue(1).setPosition(525, 525).setRadius(25).setDragDirection(Knob.HORIZONTAL).setLabel("rate_hat2").setDecimalPrecision(2).setFont(fonts);
+}
+
+
+//Sending osc-messages
+void bpm (int Value) {
+  sendOsc("er_bpm", Value);
+}
+void cut (int Value) {
+  sendOsc("er_cut", Value);
+}
+void bank (int Value) {
+  sendOsc("er_bank", Value);
+}
+void midi (int Value) {
+  sendOsc("er_midi", Value);
+}
+void vol(float Value) {
+  sendOsc("er_amp", Value);
+}
+void verb(float Value) {
+  sendOsc("er_verb", Value);
+}
+void len0(int Value) {
+  sendOsc("er_y0", Value);
+}
+void len1(int Value) {
+  sendOsc("er_y1", Value);
+}
+void len2(int Value) {
+  sendOsc("er_y2", Value);
+}
+void len3(int Value) {
+  sendOsc("er_y3", Value);
+}
+void len4(int Value) {
+  sendOsc("er_y4", Value);
+}
+void spr0(int Value) {
+  sendOsc("er_x0", Value);
+}
+void spr1(int Value) {
+  sendOsc("er_x1", Value);
+}
+void spr2(int Value) {
+  sendOsc("er_x2", Value);
+}
+void spr3(int Value) {
+  sendOsc("er_x3", Value);
+}
+void spr4(int Value) {
+  sendOsc("er_x4", Value);
+}
+void rot0(int Value) {
+  sendOsc("er_z0", Value);
+}
+void rot1(int Value) {
+  sendOsc("er_z1", Value);
+}
+void rot2(int Value) {
+  sendOsc("er_z2", Value);
+}
+void rot3(int Value) {
+  sendOsc("er_z3", Value);
+}
+void rot4(int Value) {
+  sendOsc("er_z4", Value);
+}
+void rte0(float Value) {
+  sendOsc("er_r0", Value);
+}
+void rte1(float Value) {
+  sendOsc("er_r1", Value);
+}
+void rte2(float Value) {
+  sendOsc("er_r2", Value);
+}
+void rte3(float Value) {
+  sendOsc("er_r3", Value);
+}
+void rte4(float Value) {
+  sendOsc("er_r4", Value);
+}
