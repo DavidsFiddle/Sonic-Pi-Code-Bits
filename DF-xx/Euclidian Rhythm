@@ -1,0 +1,73 @@
+#Euclidian Rhythm Mk3
+#Coded by Davids Fiddle
+#v1.0
+
+#To Do:
+
+#Globals:
+b = 0  #Sample bank index
+banks = [[:drum_bass_hard,:drum_snare_hard,:drum_tom_mid_hard,:drum_cymbal_closed,:drum_cymbal_open],
+         [:drum_heavy_kick,:drum_snare_hard,:drum_tom_mid_hard,:drum_cymbal_closed,:drum_cymbal_open],
+         [:elec_soft_kick,:elec_mid_snare,:elec_fuzz_tom,:drum_cymbal_closed,:elec_cymbal],
+         [:bd_haus,:sn_dolf,:perc_snap2,:drum_cymbal_soft,:drum_cymbal_hard],
+         [:bd_haus,:sn_dolf,:drum_tom_mid_hard,:drum_cymbal_closed,:drum_cymbal_open],
+         [:bd_klub,:sn_zome,:perc_snap,:drum_cymbal_closed,:drum_cymbal_open]]
+#Run on startup:
+defonce :init do  #Setting the initial values, needs changing
+  set '/osc/er_x0', [2]
+  set '/osc/er_y0', [8]
+  set '/osc/er_z0', [0]
+  set '/osc/er_r0', [1]
+  set '/osc/er_x1', [2]
+  set '/osc/er_y1', [8]
+  set '/osc/er_z1', [2]
+  set '/osc/er_r1', [1]
+  set '/osc/er_x2', [0]
+  set '/osc/er_y2', [8]
+  set '/osc/er_z2', [0]
+  set '/osc/er_r2', [1]
+  set '/osc/er_x3', [0]
+  set '/osc/er_y3', [8]
+  set '/osc/er_z3', [0]
+  set '/osc/er_r3', [1]
+  set '/osc/er_x4', [0]
+  set '/osc/er_y4', [8]
+  set '/osc/er_z4', [0]
+  set '/osc/er_r4', [1]
+  set '/osc/er_bpm', [60]
+  set '/osc/er_bank', [0]
+end
+
+live_loop :banks do
+  b = (sync '/osc/er_bank')[0]  #Load the current sample bank
+end
+
+with_fx :level do |amp|  #Master Volume
+  with_fx :reverb do |verb|  #Reverb effect, the mix can be controlled
+    with_fx :lpf, cutoff: 130 do |lpf|  #Lowpass effect, the cutoff can be controlled
+      live_loop :euler do
+        tick  #One tick at the start of the loop to avoid confusion
+        cue '/osc/er_clock', look  #Cue for additional code
+        sample banks[b][0], rate: (get '/osc/er_r0')[0] if (spread (get '/osc/er_x0')[0] ,(get '/osc/er_y0')[0] )[look - (get '/osc/er_z0')[0] ]
+        sample banks[b][1], rate: (get '/osc/er_r1')[0] if (spread (get '/osc/er_x1')[0] ,(get '/osc/er_y1')[0] )[look - (get '/osc/er_z1')[0] ]
+        sample banks[b][2], rate: (get '/osc/er_r2')[0] if (spread (get '/osc/er_x2')[0] ,(get '/osc/er_y2')[0] )[look - (get '/osc/er_z2')[0] ]
+        sample banks[b][3], rate: (get '/osc/er_r3')[0] if (spread (get '/osc/er_x3')[0] ,(get '/osc/er_y3')[0] )[look - (get '/osc/er_z3')[0] ]
+        sample banks[b][4], rate: (get '/osc/er_r4')[0] if (spread (get '/osc/er_x4')[0] ,(get '/osc/er_y4')[0] )[look - (get '/osc/er_z4')[0] ]
+        with_bpm (get '/osc/er_bpm')[0] do
+          sleep 0.25  #Sleep for an eighth note at the current bpm
+        end  #:euler
+      end
+      #Loops to control the effects
+      live_loop :get_cut do
+        control lpf, cutoff: (sync '/osc/er_cut')[0]
+      end  #:get_cut
+    end  #:lpf
+    live_loop :get_verb do
+      control verb, mix: (sync '/osc/er_verb')[0]
+    end  #:get_verb
+  end  #:reverb
+  live_loop :get_amp do
+    control amp, amp: (sync '/osc/er_amp')[0]
+  end  #:get_amp
+end  #:level
+#EOF
