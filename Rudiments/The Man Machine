@@ -1,0 +1,23 @@
+#The Man Machine
+
+use_bpm 86
+
+
+with_fx :echo, phase: 0.25, mix: 0.2 do
+  live_loop :plips do
+    sample :elec_plip, rate: 1.1 if (ring 1,1,1,1,1,0,1,1,1,0,1,0,1,1,0,0).tick == 1
+    sleep 0.25
+  end
+end
+
+live_loop :snare do
+  sample :elec_mid_snare, amp: 0.7 if (ring 1,0,1,0,0,0,1,0).tick == 1
+  sleep 0.5
+end
+
+live_loop :riff do
+  use_synth :prophet
+  use_synth_defaults sustain: 0, release: 0.3, amp: 0.8
+  play (ring :g4,:g5,:g4,:g5,:fs5,:r,:e5,:fs5,:g5,:r,:fs5,:g5,:a5,:r,:r,:r).tick
+  sleep 0.25
+end
