@@ -2,9 +2,13 @@
 #Coded by Davids Fiddle
 
 bpm = 60
-use_random_seed 42
+use_random_seed 123
 list_i = synth_names
 list_s = scale_names
+stop_time = rand_i(60)+60
+f0 = 1
+f1 = 1
+f2 = 1
 
 n0 = 60
 s0 = :major
@@ -33,6 +37,7 @@ live_loop :clock do
     cue 'c',look
     sleep 0.25
   end
+  stop if f0+f1+f2 == 0
 end
 
 live_loop :mod do
@@ -99,6 +104,10 @@ live_loop :v0 do
   use_synth_defaults amp: a0, cutoff: r1
   n0 = (ring *(scale r0,s0,num_octaves: o0),:r,:r).choose
   play n0
+  if vt > stop_time
+    f0 = 0
+    stop if one_in(10)
+  end
 end
 live_loop :v1 do
   sync "/cue/c"
@@ -107,6 +116,10 @@ live_loop :v1 do
   use_synth_defaults amp: a1, cutoff: r2
   n1 = (ring *(scale r1,s1,num_octaves: o1),:r,:r).choose
   play n1
+  if vt > stop_time
+    f1 = 0
+    stop if one_in(10)
+  end
 end
 live_loop :v2 do
   sync "/cue/c"
@@ -115,4 +128,8 @@ live_loop :v2 do
   use_synth_defaults amp: a2, cutoff: r0
   n2 = (ring *(scale r2,s2,num_octaves: o2),:r,:r).choose
   play n2
+  if vt > stop_time
+    f2 = 0
+    stop if one_in(10)
+  end
 end
