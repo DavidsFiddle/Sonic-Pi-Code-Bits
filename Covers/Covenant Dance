@@ -99,6 +99,7 @@ end
 in_thread do
   with_fx :reverb do
     use_synth :fm
+    use_synth_defaults sustain: 0.5, release: 0.5
     sleep 12*7
     8.times do
       3.times do
