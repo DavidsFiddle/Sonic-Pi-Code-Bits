@@ -1,6 +1,6 @@
 //DF-03 Machine
 //Coded by Davids Fiddle
-//v1.1
+//v1.2
 
 import oscP5.*;                   //Needs oscP5 and controlP5 libraries
 import netP5.*;                   
