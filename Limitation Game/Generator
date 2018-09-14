@@ -1,0 +1,12 @@
+#Random Limitations Game
+#Coded by Davids Fiddle
+x0 = synth_names
+x1 = sample_names :drum
+x2 = sample_names :bd
+x3 = sample_names :sn
+
+list = x0 + x1 + x2 + x3
+#puts list
+
+use_random_seed 14092018  #Insert the current date or any other seed
+puts list.pick(5)
