@@ -17,8 +17,7 @@ live_loop :drumsss do
   sample :drum_heavy_kick if (spread e0,32).look
   sample :bd_zum if (spread e1,32).look
   sample :drum_cymbal_closed if (spread e2,32).look
-  use_synth_defaults sustain: 0, release: 0.2
-  synth :pnoise, cutoff: (line 90,110).choose if (spread e3,32).look
+  synth :pnoise, sustain: 0, release: 0.2, cutoff: (line 90,110).choose if (spread e3,32).look
   synth :noise, release: 0.05, decay: 0.05, sustain_level: 0.6, cutoff: (line 110,120).choose if (spread e4,32).look
   sleep 0.125
 end
