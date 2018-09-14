@@ -1,0 +1,24 @@
+#Limitation Game Coding 14.09.2018
+#by Davids Fiddle
+
+e0 = 15
+e1 = 5
+e2 = 17
+e3 = 5
+e4 = 15
+
+live_loop :drumsss do
+  tick
+  e0 = (line 10,20).choose if one_in(12)
+  e1 = (line 2,10).choose if one_in(12)
+  e2 = (line 15,25).choose if one_in(12)
+  e3 = (line 2,10).choose if one_in(12)
+  e4 = (line 10,20).choose if one_in(12)
+  sample :drum_heavy_kick if (spread e0,32).look
+  sample :bd_zum if (spread e1,32).look
+  sample :drum_cymbal_closed if (spread e2,32).look
+  use_synth_defaults sustain: 0, release: 0.2
+  synth :pnoise, cutoff: (line 90,110).choose if (spread e3,32).look
+  synth :noise, release: 0.05, decay: 0.05, sustain_level: 0.6, cutoff: (line 110,120).choose if (spread e4,32).look
+  sleep 0.125
+end
