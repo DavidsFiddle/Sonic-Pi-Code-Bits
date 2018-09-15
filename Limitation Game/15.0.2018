@@ -13,10 +13,10 @@ end
 
 live_loop :drums do
   stop if flag
-  use_sample_defaults rate: (line 0.125,0.8).choose
-  sample :drum_bass_hard if one_in(3)
-  sample :drum_splash_soft if one_in(4)
-  sample :drum_tom_lo_soft if one_in(5)
+  use_sample_defaults rate: (line -1,1,steps: 21).choose
+  sample :drum_bass_hard if one_in(2)
+  sample :drum_splash_soft if one_in(3)
+  sample :drum_tom_lo_soft if one_in(3)
   sleep 4
 end
 
