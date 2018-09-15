@@ -17,7 +17,7 @@ live_loop :drums do
   sample :drum_bass_hard if one_in(2)
   sample :drum_splash_soft if one_in(3)
   sample :drum_tom_lo_soft if one_in(3)
-  sleep 4
+  sleep (line 2,5).choose
 end
 
 use_synth_defaults sustain: 180, note: 55, slide: 1.5, amp: 0
@@ -25,12 +25,16 @@ s0 = synth :tri
 s1 = synth :tri
 s2 = synth :tri
 live_loop :notes do
+  stop if flag
   control s0, amp: (line 0.5,1).choose if one_in(2)
   control s1, amp: (line 0.5,1).choose if one_in(2)
   control s2, amp: (line 0.5,1).choose if one_in(2)
-  control s0, note: line(54,56, steps: 20).choose if one_in(2)
-  control s1, note: line(54,56, steps: 20).choose if one_in(2)
-  control s2, note: line(54,56, steps: 20).choose if one_in(2)
+  control s0, pan: (line -0.5,0.5).choose if one_in(2)
+  control s1, pan: (line -0.5,0.5).choose if one_in(2)
+  control s2, pan: (line -0.5,0.5).choose if one_in(2)
+  control s0, note: line(50,60, steps: 50).choose if one_in(2)
+  control s1, note: line(50,60, steps: 50).choose if one_in(2)
+  control s2, note: line(50,60, steps: 50).choose if one_in(2)
   sleep 2
 end
 
