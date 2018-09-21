@@ -1,1 +1,73 @@
+#Bounce
+#Coded by Davids Fiddle
 
+use_bpm 42
+
+root = :d3
+
+s0 = 0.5
+s1 = 0.5
+s2 = 0.5
+s3 = 0.5
+s4 = 0.5
+s5 = 0.5
+s6 = 0.5
+s7 = 0.5
+
+live_loop :con_knob do
+  key,val = sync "/midi/apc_key_25/0/1/control_change"
+  s0 = val / 64.0 + 0.5 if key == 48
+  s1 = val / 64.0 + 0.5 if key == 49
+  s2 = val / 64.0 + 0.5 if key == 50
+  s3 = val / 64.0 + 0.5 if key == 51
+  s4 = val / 64.0 + 0.5 if key == 52
+  s5 = val / 64.0 + 0.5 if key == 53
+  s6 = val / 64.0 + 0.5 if key == 54
+  s7 = val / 64.0 + 0.5 if key == 55
+end
+
+live_loop :con_root do
+  key,vel = sync "/midi/apc_key_25/0/2/note_on"
+  root = key
+end
+
+live_loop :bounce0 do
+  synth :pluck,
+    note: (chord root,:minor,num_octaves: 3)[0]
+  sleep s0
+end
+live_loop :bounce1 do
+  synth :pluck,
+    note: (chord root,:minor,num_octaves: 3)[1]
+  sleep s1
+end
+live_loop :bounce2 do
+  synth :pluck,
+    note: (chord root,:minor,num_octaves: 3)[2]
+  sleep s2
+end
+live_loop :bounce3 do
+  synth :pluck,
+    note: (chord root,:minor,num_octaves: 3)[3]
+  sleep s3
+end
+live_loop :bounce4 do
+  synth :pluck,
+    note: (chord root,:minor,num_octaves: 3)[4]
+  sleep s4
+end
+live_loop :bounce5 do
+  synth :pluck,
+    note: (chord root,:minor,num_octaves: 3)[5]
+  sleep s5
+end
+live_loop :bounce6 do
+  synth :pluck,
+    note: (chord root,:minor,num_octaves: 3)[6]
+  sleep s6
+end
+live_loop :bounce7 do
+  synth :pluck,
+    note: (chord root,:minor,num_octaves: 3)[7]
+  sleep s7
+end
