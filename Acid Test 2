@@ -1,0 +1,40 @@
+#Acid Test 2
+#Coded by Davids Fiddle
+
+use_bpm 138
+
+live_loop :kick do
+  sample :bd_haus, amp: 3
+  sample :bd_boom
+  sleep 1
+end
+
+with_fx :slicer, slide: 2, mix: 0.8, pulse_width: 0.4 do |slice|
+  live_loop :hatz do
+    sync "/live_loop/kick"
+    synth :noise, sustain: 0.9, release: 0.2, amp: 0.7
+  end
+  live_loop :con_slice do
+    control slice, pulse_width: (line 0.2,0.4).choose
+    control slice, mix: (line 0.7,0.9).choose
+    sleep 4
+  end
+end
+
+with_fx :distortion, slide: 4 do |dist|
+  live_loop :bass do
+    tick
+    use_synth_defaults amp: 0.7, sustain: 0.1, release: 0.4, res: 0.93
+    synth :tb303, note: (knit :d2,14,:d4,1,:d2,1,:d3,1).look, cutoff: (ring :d3,:d4,:d3,:d5,:d4,:d3).look
+    sleep (knit 0.5,13,0.25,2,0.5,2).look
+  end
+  live_loop :con_dist do
+    control dist, distortion: (line 0.5,0.9).choose
+    sleep 4
+  end
+end
+
+live_loop :sampler do
+  sample 'glitch_perc', pick, amp: 2, rate: (line 0.5,1.1, steps: 20).choose
+  sleep 4
+end
