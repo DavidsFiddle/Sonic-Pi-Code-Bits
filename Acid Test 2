@@ -9,14 +9,15 @@ live_loop :kick do
   sleep 1
 end
 
-with_fx :slicer, slide: 2, mix: 0.8, pulse_width: 0.4 do |slice|
+with_fx :slicer, slide: 2, mix: 0.8, pulse_width: 0.4 do |slice|  #Using a slicer to create hihats from noise
   live_loop :hatz do
     sync "/live_loop/kick"
     synth :noise, sustain: 0.9, release: 0.2, amp: 0.7
   end
   live_loop :con_slice do
-    control slice, pulse_width: (line 0.2,0.4).choose
-    control slice, mix: (line 0.7,0.9).choose
+    #Some automation for variety
+    control slice, pulse_width: (line 0.2,0.4).choose  #Keep the pulses short for hihats or long for a ride cymbal
+    control slice, mix: (line 0.7,0.9).choose  #Automating the cymbal wash
     sleep 4
   end
 end
@@ -24,11 +25,13 @@ end
 with_fx :distortion, slide: 4 do |dist|
   live_loop :bass do
     tick
-    use_synth_defaults amp: 0.7, sustain: 0.1, release: 0.4, res: 0.93
+    use_synth_defaults amp: 0.7, sustain: 0.1, release: 0.4, res: 0.93  #High resonance, could be automated as well
     synth :tb303, note: (knit :d2,14,:d4,1,:d2,1,:d3,1).look, cutoff: (ring :d3,:d4,:d3,:d5,:d4,:d3).look
+    #Notice that the riff has 17 steps, the cutoff automation has 6. This adds some variation to the bass sound.
     sleep (knit 0.5,13,0.25,2,0.5,2).look
   end
   live_loop :con_dist do
+    #Some automation for variety
     control dist, distortion: (line 0.5,0.9).choose
     sleep 4
   end
