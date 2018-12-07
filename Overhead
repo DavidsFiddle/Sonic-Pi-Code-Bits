@@ -1,0 +1,63 @@
+#Overhead
+#Coded by Davids Fiddle
+
+time = 240
+frequency = 50
+
+
+root = frequency
+amps = (line 0.05,0.5)
+pans = (line -0.8,0.8,steps: 16)
+use_synth :sine
+use_synth_defaults sustain: time, slide: 2, note_slide: 8, amp: 0.4, attack: 0.2
+
+with_fx :echo, pre_amp: 0.6 do
+  with_fx :compressor do
+    s1 = play hz_to_midi root * 1
+    s2 = play hz_to_midi root * 2
+    s3 = play hz_to_midi root * 3
+    s4 = play hz_to_midi root * 4
+    s5 = play hz_to_midi root * 5
+    s6 = play hz_to_midi root * 6
+    s7 = play hz_to_midi root * 7
+    s8 = play hz_to_midi root * 8
+    s9 = play hz_to_midi root * 9
+    s10 = play hz_to_midi root * 10
+    s11 = play hz_to_midi root * 11
+    s12 = play hz_to_midi root * 12
+    
+    
+    live_loop :con do
+      control s1, amp: amps.choose, pan: pans.choose
+      control s2, amp: amps.choose, pan: pans.choose
+      control s3, amp: amps.choose, pan: pans.choose
+      control s4, amp: amps.choose, pan: pans.choose
+      control s5, amp: amps.choose, pan: pans.choose
+      control s6, amp: amps.choose, pan: pans.choose
+      control s7, amp: amps.choose, pan: pans.choose
+      control s8, amp: amps.choose, pan: pans.choose
+      control s9, amp: amps.choose, pan: pans.choose
+      control s10, amp: amps.choose, pan: pans.choose
+      control s11, amp: amps.choose, pan: pans.choose
+      control s12, amp: amps.choose, pan: pans.choose
+      sleep 2
+    end
+    
+    live_loop :con_root do
+      root = (range frequency,frequency * 2).choose
+      control s1, note: (hz_to_midi root * 1)
+      control s2, note: (hz_to_midi root * 2)
+      control s3, note: (hz_to_midi root * 3)
+      control s4, note: (hz_to_midi root * 4)
+      control s5, note: (hz_to_midi root * 5)
+      control s6, note: (hz_to_midi root * 6)
+      control s7, note: (hz_to_midi root * 7)
+      control s8, note: (hz_to_midi root * 8)
+      control s9, note: (hz_to_midi root * 9)
+      control s10, note: (hz_to_midi root * 8)
+      control s11, note: (hz_to_midi root * 9)
+      control s12, note: (hz_to_midi root * 9)
+      sleep 8
+    end
+  end
+end
