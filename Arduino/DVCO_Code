@@ -1,0 +1,34 @@
+//Arduino-DVCO Mk4
+//by Davids Fiddle
+
+
+//Pins:
+static byte clockPin = 2;
+static byte syncPin = 3;
+static byte resetPin = 4;
+
+static byte finePin = 4;
+static byte cvPin = 1;
+static byte coarsePin = 6;
+
+//Variables:
+float frequency = 440;  //Reference frequency. With all control inputs at 0, the clock output will be this frequency
+
+void setup() {
+  //Serial.begin(9600);
+  pinMode(clockPin, OUTPUT);
+  pinMode(resetPin, OUTPUT);
+  digitalWrite(resetPin, HIGH);
+  attachInterrupt(digitalPinToInterrupt(syncPin), sync, RISING);
+}
+
+void loop() {
+  Serial.println(analogRead(cvPin));
+  tone(clockPin, frequency * (analogRead(finePin) / 1024.0 + 1) * pow(2, constrain(analogRead(cvPin) / 102.4, 0, 4)) * pow(2, int(map(analogRead(coarsePin), 0, 1024, 0, 5))));
+  }
+
+void sync() {
+  digitalWrite(resetPin, LOW);
+  delayMicroseconds(5);
+  digitalWrite(resetPin, HIGH);
+}
