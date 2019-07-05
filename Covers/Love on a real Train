@@ -1,0 +1,140 @@
+#Love on a real train
+#Cover by Davids Fiddle
+
+fadeIn1 = (ramp *(line 0,1,steps: 16 * 8))
+fadeIn2 = (ramp *(line 0,1,steps: 16 * 4))
+use_bpm 104
+
+padSection = true
+fin = false
+
+in_thread do  #Control Sections
+  sleep 128
+  padSection = false
+  sleep 64
+  padSection = true
+  sleep 64
+  fin = true
+end
+
+with_fx :reverb, room: 0.4 do
+  in_thread do  #Intro Pad
+    sample :bass_thick_c, pitch: 5, amp: 1,
+      window_size: 0.5, rate: 0.5,
+      time_dis: 0.1,
+      sustain: sample_duration(:bass_thick_c) * 2 - 2, release: 2
+  end
+  
+  with_fx :ixi_techno, cutoff_min: 90, res: 0.7, phase: 16, mix: 0, slide: 8 do |ixi|
+    live_loop :riff, delay: 8 do
+      stop if fin
+      tick
+      use_synth :dsaw
+      use_synth_defaults sustain: 0.2,
+        release: 0.8, amp: fadeIn1.look * 0.6
+      play (ring :f4,:r,:eb4,:r,:f4,:r,:c4,:f4,:r,:f4,:r,:eb4,:bb3,:r,:c4,:r).look
+      sleep 0.25
+    end
+    in_thread do  #Control Ixi
+      sleep 64
+      control ixi, mix: 0.2
+      
+    end
+  end
+  
+  with_fx :level, amp: 0, slide: 4 do |padLevel|
+    live_loop :pad1 do
+      use_synth :prophet
+      if padSection
+        tick
+        use_synth_defaults attack: 0.1, sustain: 16, release: 1,
+          cutoff: :f5, res: 0.4
+        play :f2, amp: 0.7
+        play :c3, amp: 0.5
+        play :f4, amp: 0.5
+        sleep 16
+      else
+        use_synth_defaults sustain: 3.5, release: 1,
+          cutoff: :f5, res: 0.4
+        4.times do
+          tick
+          play :f2
+          sleep 4
+        end
+        12.times do
+          tick
+          play (ring :cs3,:ds3,:f3,:f3).look
+          play (ring :as3,:c3,:f3,:f3).look
+          sleep 4
+        end
+      end
+    end
+    in_thread do  #Control pad amp
+      control padLevel, amp: 1
+      sleep 256
+      control padLevel, amp: 0.75
+      sleep 4
+      control padLevel, amp: 0.5
+      sleep 4
+      control padLevel, amp: 0.25
+      sleep 4
+      control padLevel, amp: 0
+    end
+  end
+end
+
+with_fx :reverb, room: 0.6 do
+  live_loop :plucks1, delay: 32 do
+    stop if fin
+    tick
+    use_merged_synth_defaults amp: fadeIn2.look * (line 0.6,0.8).choose,
+      coef: (line 0.1,0.3,steps: 24).mirror.look
+    4.times do
+      if(padSection)
+        synth :pluck, note: :f4
+        synth :pluck, note: :c5
+        synth :pluck, note: :f5
+      end
+      sleep 0.25
+    end
+  end
+  with_fx :level, amp: 0, slide: 8 do |pl2|
+    live_loop :plucks2 do
+      tick
+      use_synth :pluck
+      use_synth_defaults coef: 0.2,
+        amp: 1
+      play (ring :f4,:g4,:gs4,:bb4,:r,:g4,:gs4,:r).look
+      play (ring :f4,:g4,:gs4,:bb4,:r,:g4,:gs4,:r).look + 12
+      sleep 0.5
+    end
+    in_thread do  #Control Pluck2
+      sleep 128
+      control pl2, amp: 1
+      sleep 64
+      control pl2, amp: 0
+      sleep 64
+      control pl2, amp: 1
+      sleep 8
+      control pl2, amp: 0
+    end
+  end
+end
+
+live_loop :fanfare, delay: 32 do
+  stop if fin
+  s = synth :blade, note: :f3, slide: 0.5, sustain: 1, release: 2
+  control s, note: (knit :c4,6,:eb4,4,:bb4,1,:f5,3).choose
+  sleep (ring 16,16,16,24,24,32).choose
+end
+
+live_loop :cymbals, delay: 128 do
+  stop if fin
+  tick
+  on (ring 1,0,1,1).look do
+    synth :noise, sustain: 0,
+      release: 0.2 + (line -0.05, 0.05).choose,
+      amp: (line 0.5,1).choose * 0.6 * fadeIn2.look
+  end
+  sleep 0.25
+end
