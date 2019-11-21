@@ -1,5 +1,8 @@
 #Atonal Ambience
 #Coded by Davids Fiddle
+#https://youtu.be/uF8saqnApwI
+
+
 use_random_seed 42
 s0 = sample_names :ambi
 s1 = sample_names :elec
