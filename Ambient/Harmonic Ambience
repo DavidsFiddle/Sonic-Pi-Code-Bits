@@ -1,5 +1,8 @@
 #Harmonic Ambience
 #Coded by Davids Fiddle
+#https://youtu.be/fh4oHnBAKss
+
+
 use_random_seed 12
 roots = (ring :d3, :f3)  #Chord roots
 types = (ring :m13, '7sus4')  #Chord types
