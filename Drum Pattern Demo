@@ -1,0 +1,36 @@
+#Drum patterns
+#Coded by Davids Fiddle
+
+#Samples to use
+kick =  :drum_bass_hard
+snare =  :drum_snare_hard
+hat =  :drum_cymbal_closed
+
+#Patterns
+#Kick:
+pat_kick = [
+  (bools 1,0,0,0,1,0,0,0),  #Section 0
+  (bools 1,0,0,1,0,1,0,0)   #Section 1
+]                         #Extend to add more sections
+#Snare
+pat_snare = [
+  (bools 0,0,1,0,0,0,1,0),
+  (bools 0,0,1,0,0,0,1,0)
+]
+#Hihat:
+pat_hat = [
+  (bools 1,1,1,1,1,1,1,1),
+  (bools 1,1,1,1,1,1,1,1)
+]
+#Copy and adapt for more samples
+
+#Section Pattern:
+sections = (ring 0,0,0,1).stretch(8)  #stretch should have the pattern length as parameter, otherwise weird things will happen
+
+live_loop :play_patterns do
+  tick
+  sample hat if pat_hat_n[sections.tick].look
+  sample kick if pat_kick_n[sections.tick].look
+  sample snare if pat_snare_n[sections.tick].look
+  sleep 0.25
+end
