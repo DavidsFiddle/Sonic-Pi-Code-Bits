@@ -1,6 +1,7 @@
 #Drum patterns
 #Coded by Davids Fiddle
 
+
 #Samples to use
 kick =  :drum_bass_hard
 snare =  :drum_snare_hard
@@ -29,8 +30,8 @@ sections = (ring 0,0,0,1).stretch(8)  #stretch should have the pattern length as
 
 live_loop :play_patterns do
   tick
-  sample hat if pat_hat_n[sections.tick].look
-  sample kick if pat_kick_n[sections.tick].look
-  sample snare if pat_snare_n[sections.tick].look
+  sample hat if pat_hat[sections.look].look
+  sample kick if pat_kick[sections.look].look
+  sample snare if pat_snare[sections.look].look
   sleep 0.25
 end
