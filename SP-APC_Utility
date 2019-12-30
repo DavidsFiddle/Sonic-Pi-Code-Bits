@@ -1,0 +1,78 @@
+#SP-APC Utility
+#by Davids Fiddle
+#v1.0
+
+
+#APC Utility BEGIN
+#Globals:
+use_bpm 60  #BPM for the piece
+use_sched_ahead_time 0.2  #Balance between playability and stability
+#States of the tracks:
+states = [0,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0
+          ]
+#0 means nothing will happen (disabled)
+#1 means green (active)
+#3 means red (inactive)
+#5 means toggle off (yellow), will switch to 7(also green)
+#7 means toggle off (green), will switch to 5(yellow)
+toggle = (ring 0,3,0,1,0,7,0,5)  #For switching the lights
+knobs = [48,49,50,51,52,53,54,55]  #Adresses for the knobs
+knob0 = 0
+knob1 = 0
+knob2 = 0
+knob3 = 0
+knob4 = 0
+knob5 = 0
+knob6 = 0
+knob7 = 0
+define :all_lights do
+  #Updates all lights
+  for x in (range 0,40)
+    midi_note_on x, states[x]
+  end
+end  #:all_lights
+define :all_off do
+  #Turns all lights off
+  for i in (range 0,87)
+    midi_note_on i,0
+  end
+end  #:all_off
+all_off
+sleep 0.1
+live_loop :midi_control do
+  key,vel = sync "/midi/apc_key_25/0/1/note_on"  #Wait for midi messages
+  if key < 40  #Ignore messages 'out of bounds'
+    states[key] = toggle[states[key]]  #Update the track values
+    midi_note_on key, states[key]  #Update the track lights
+    cue 'event', key
+  end
+end  #:midi_control
+live_loop :midi_cc do
+  key,val = sync "/midi/apc_key_25/0/1/control_change"  #Wait for midi messages
+  case key
+  when knobs[0]
+    cue 'knob0', val
+  when knobs[1]
+    cue 'knob1', val
+  when knobs[2]
+    cue 'knob2', val
+  when knobs[3]
+    cue 'knob3', val
+  when knobs[4]
+    cue 'knob4', val
+  when knobs[5]
+    cue 'knob5', val
+  when knobs[6]
+    cue 'knob6', val
+  when knobs[7]
+    cue 'knob7', val
+  end
+  #Cues are sent per knob to avoid multiple listening loops syncing possibly 100 times in a second
+end  #:midi_cc
+all_lights  #initialise the lights
+sleep 0.1
+#APC_Utility END
