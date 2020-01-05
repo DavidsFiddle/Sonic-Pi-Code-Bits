@@ -1,6 +1,6 @@
-#SP-APC Utility
+#APC Utility
 #by Davids Fiddle
-#v1.0
+#v1.1
 
 
 #APC Utility BEGIN
@@ -56,20 +56,28 @@ live_loop :midi_cc do
   case key
   when knobs[0]
     cue 'knob0', val
+    knob0 = val
   when knobs[1]
     cue 'knob1', val
+    knob1 = val
   when knobs[2]
     cue 'knob2', val
+    knob2 = val
   when knobs[3]
     cue 'knob3', val
+    knob3 = val
   when knobs[4]
     cue 'knob4', val
+    knob4 = val
   when knobs[5]
     cue 'knob5', val
+    knob5 = val
   when knobs[6]
     cue 'knob6', val
+    knob6 = val
   when knobs[7]
     cue 'knob7', val
+    knob7 = val
   end
   #Cues are sent per knob to avoid multiple listening loops syncing possibly 100 times in a second
 end  #:midi_cc
