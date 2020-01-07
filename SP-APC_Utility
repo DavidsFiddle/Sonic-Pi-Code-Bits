@@ -1,11 +1,9 @@
 #APC Utility
 #by Davids Fiddle
-#v1.1
-
+#v1.2
 
 #APC Utility BEGIN
 #Globals:
-use_bpm 60  #BPM for the piece
 use_sched_ahead_time 0.2  #Balance between playability and stability
 #States of the tracks:
 states = [0,0,0,0,0,0,0,0,
@@ -14,14 +12,17 @@ states = [0,0,0,0,0,0,0,0,
           0,0,0,0,0,0,0,0,
           0,0,0,0,0,0,0,0
           ]
+#This list represents the pad matrix. If your controller has more pads, you'll have to extend it to use the other pads.
+num_pads = 40  #number of pads. Adapt to your device.
 #0 means nothing will happen (disabled)
 #1 means green (active)
 #3 means red (inactive)
 #5 means toggle off (yellow), will switch to 7(also green)
 #7 means toggle off (green), will switch to 5(yellow)
 toggle = (ring 0,3,0,1,0,7,0,5)  #For switching the lights
-knobs = [48,49,50,51,52,53,54,55]  #Adresses for the knobs
-knob0 = 0
+#MIDI-CC:
+knob_adr = [48,49,50,51,52,53,54,55]  #Adresses for the knobs
+knob0 = 0  #Values of the knobs
 knob1 = 0
 knob2 = 0
 knob3 = 0
@@ -31,13 +32,13 @@ knob6 = 0
 knob7 = 0
 define :all_lights do
   #Updates all lights
-  for x in (range 0,40)
+  for x in (range 0,num_pads)
     midi_note_on x, states[x]
   end
 end  #:all_lights
 define :all_off do
   #Turns all lights off
-  for i in (range 0,87)
+  for i in (range 0,num_pads)
     midi_note_on i,0
   end
 end  #:all_off
@@ -45,10 +46,10 @@ all_off
 sleep 0.1
 live_loop :midi_control do
   key,vel = sync "/midi/apc_key_25/0/1/note_on"  #Wait for midi messages
-  if key < 40  #Ignore messages 'out of bounds'
+  if key < num_pads  #Ignore messages 'out of bounds'
     states[key] = toggle[states[key]]  #Update the track values
     midi_note_on key, states[key]  #Update the track lights
-    cue 'event', key
+    #cue 'event', key  #Disabled for performance, enable if you need it.
   end
 end  #:midi_control
 live_loop :midi_cc do
@@ -82,5 +83,6 @@ live_loop :midi_cc do
   #Cues are sent per knob to avoid multiple listening loops syncing possibly 100 times in a second
 end  #:midi_cc
 all_lights  #initialise the lights
+use_bpm 60  #BPM for the piece
 sleep 0.1
 #APC_Utility END
