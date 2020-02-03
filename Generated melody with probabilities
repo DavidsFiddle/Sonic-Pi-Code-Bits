@@ -2,14 +2,14 @@
 #also makes it easier to change keys
 
 prob_tables = [
-(1),
-(2),
-(3),
-(4),
-(5),
-(6),
-(7),
-(0),
+(ring 1),
+(ring 2),
+(ring 3),
+(ring 4),
+(ring 5),
+(ring 6),
+(ring 7),
+(ring 0),
 ]
 #each ring holds the possible next notes for that scale degree
 #this just plays the scale, change this for actual use
