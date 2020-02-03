@@ -12,7 +12,7 @@ prob_tables = [
 (0),
 ]
 #each ring holds the possible next notes for that scale degree
-#this just plays the scale, change this to knit for actual use
+#this just plays the scale, change this for actual use
 
 note = 1
 root = :c3
