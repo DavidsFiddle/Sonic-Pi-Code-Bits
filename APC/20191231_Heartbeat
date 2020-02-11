@@ -1,0 +1,152 @@
+#20191231_Heartbeat
+#by Davids Fiddle
+
+
+
+#APC Utility BEGIN
+#Globals:
+use_bpm 60  #BPM for the piece
+use_sched_ahead_time 0.2  #Balance between playability and stability
+#States of the tracks:
+states = [3,0,3,0,3,0,3,0,
+          0,3,3,0,0,0,0,0,
+          0,3,3,0,0,0,0,0,
+          1,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0
+          ]
+#0 means nothing will happen (disabled)
+#1 means green (active)
+#3 means red (inactive)
+#5 means toggle off (yellow), will switch to 7(also green)
+#7 means toggle off (green), will switch to 5(yellow)
+toggle = (ring 0,3,0,1,0,7,0,5)  #For switching the lights
+knobs = [48,49,50,51,52,53,54,55]  #Adresses for the knobs
+knob0 = 0
+knob1 = 0
+knob2 = 0
+knob3 = 0
+knob4 = 0
+knob5 = 0
+knob6 = 0
+knob7 = 0
+define :all_lights do
+  #Updates all lights
+  for x in (range 0,40)
+    midi_note_on x, states[x]
+  end
+end  #:all_lights
+define :all_off do
+  #Turns all lights off
+  for i in (range 0,87)
+    midi_note_on i,0
+  end
+end  #:all_off
+all_off
+sleep 0.1
+live_loop :midi_control do
+  key,vel = sync "/midi/apc_key_25/0/1/note_on"  #Wait for midi messages
+  if key < 40  #Ignore messages 'out of bounds'
+    states[key] = toggle[states[key]]  #Update the track values
+    midi_note_on key, states[key]  #Update the track lights
+    cue 'event', key
+  end
+end  #:midi_control
+live_loop :midi_cc do
+  key,val = sync "/midi/apc_key_25/0/1/control_change"  #Wait for midi messages
+  case key
+  when knobs[0]
+    cue 'knob0', val
+    knob0 = val
+  when knobs[1]
+    cue 'knob1', val
+    knob1 = val
+  when knobs[2]
+    cue 'knob2', val
+    knob2 = val
+  when knobs[3]
+    cue 'knob3', val
+    knob3 = val
+  when knobs[4]
+    cue 'knob4', val
+    knob4 = val
+  when knobs[5]
+    cue 'knob5', val
+    knob5 = val
+  when knobs[6]
+    cue 'knob6', val
+    knob6 = val
+  when knobs[7]
+    cue 'knob7', val
+    knob7 = val
+  end
+  #Cues are sent per knob to avoid multiple listening loops syncing possibly 100 times in a second
+end  #:midi_cc
+all_lights  #initialise the lights
+sleep 0.1
+#APC_Utility END
+
+
+with_fx :reverb do
+  with_fx :compressor do
+    with_fx :distortion, distort: 0 do |dist|
+      with_fx :echo, mix: 0.2, decay: 1 do
+        live_loop :heartbleed do
+          tick
+          if states[24] == 1
+            play :f1, amp: 1.5
+            play :f2, amp: 1.5
+          end
+          sleep 1
+        end  #:heartbleed
+      end  #:echo
+      live_loop :con_dist do
+        val = sync "/cue/knob0"
+        control dist, distort: val[0] / 172.0
+      end
+    end  #:distortion
+    
+    
+    notes = (ring :f2,:c3,:f3,:bb3,:c4,:eb4,:f4,:bb4,:c5,:eb5,:f5)
+    live_loop :breath do
+      tick
+      use_synth :hollow
+      use_synth_defaults attack: 2, sustain: 4, release: 2
+      play_chord notes.pick(5) if states[4] == 1
+      sleep 4
+    end  #:breath
+    
+    riff = (scale :f3, :minor_pentatonic, num_octaves: 2).pick(16)
+    live_loop :riff do
+      tick
+      use_synth :prophet
+      play riff.look + (ring 0,0,12,0,0,0,0).look if states[6] == 1 && rand_i(128) < knob1
+      
+      sleep 0.25
+    end  #:riff
+    
+    with_fx :echo, phase: 2.0/4, mix: 0.2 do |echo|
+      live_loop :percussion do
+        tick
+        use_sample_defaults amp: 0.5
+        
+        
+        sample :bass_dnb_f if rand() < 0.1 && states[0] == 1
+        sample 'glitch', choose, pan: rrand(-0.3,0.3),
+          rate: rrand(-1.5,1.5) if rand() < 0.1 && states[2] == 1
+        sample :loop_industrial, onset: choose, pan: rrand(-0.3,0.3),
+          rate: rrand(-1.5,1.5) if rand() < 0.1 && states[10] == 1
+        sample 'perc', choose,  pan: rrand(-0.3,0.3),
+          rate: rrand(-1.5,1.5) if rand() < 0.1 && states[18] == 1
+        sample :loop_electric, onset: choose,  pan: rrand(-0.3,0.3),
+          rate: rrand(-1.5,1.5) if rand() < 0.1 && states[9] == 1
+        sample :loop_tabla, onset: choose,  pan: rrand(-0.3,0.3),
+          rate: rrand(-1.5,1.5) if rand() < 0.1 && states[17] == 1
+        sleep (ring 0.25, 0.5).choose
+      end  #:percussion
+      live_loop :con_echo do
+        sync "/cue/knob2"
+        control echo, phase: 2.0 / (knob2 / 8)
+      end
+    end  #:echo
+  end  #:compressor
+end  #:reverb
