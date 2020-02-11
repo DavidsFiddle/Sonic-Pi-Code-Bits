@@ -1,0 +1,128 @@
+#20191231_EKG
+#by Davids Fiddle
+
+
+
+#APC Utility BEGIN
+#Globals:
+use_bpm 104  #BPM for the piece
+use_sched_ahead_time 0.2  #Balance between playability and stability
+#States of the tracks:
+states = [3,3,3,0,1,1,0,0,
+          0,0,3,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,
+          1,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0
+          ]
+#0 means nothing will happen (disabled)
+#1 means green (active)
+#3 means red (inactive)
+#5 means toggle off (yellow), will switch to 7(also green)
+#7 means toggle off (green), will switch to 5(yellow)
+toggle = (ring 0,3,0,1,0,7,0,5)  #For switching the lights
+knobs = [48,49,50,51,52,53,54,55]  #Adresses for the knobs
+knob0 = 0
+knob1 = 0
+knob2 = 0
+knob3 = 0
+knob4 = 0
+knob5 = 0
+knob6 = 0
+knob7 = 0
+define :all_lights do
+  #Updates all lights
+  for x in (range 0,40)
+    midi_note_on x, states[x]
+  end
+end  #:all_lights
+define :all_off do
+  #Turns all lights off
+  for i in (range 0,87)
+    midi_note_on i,0
+  end
+end  #:all_off
+all_off
+sleep 0.1
+live_loop :midi_control do
+  key,vel = sync "/midi/apc_key_25/0/1/note_on"  #Wait for midi messages
+  if key < 40  #Ignore messages 'out of bounds'
+    states[key] = toggle[states[key]]  #Update the track values
+    midi_note_on key, states[key]  #Update the track lights
+    cue 'event', key
+  end
+end  #:midi_control
+live_loop :midi_cc do
+  key,val = sync "/midi/apc_key_25/0/1/control_change"  #Wait for midi messages
+  case key
+  when knobs[0]
+    cue 'knob0', val
+    knob0 = val
+  when knobs[1]
+    cue 'knob1', val
+    knob1 = val
+  when knobs[2]
+    cue 'knob2', val
+    knob2 = val
+  when knobs[3]
+    cue 'knob3', val
+    knob3 = val
+  when knobs[4]
+    cue 'knob4', val
+    knob4 = val
+  when knobs[5]
+    cue 'knob5', val
+    knob5 = val
+  when knobs[6]
+    cue 'knob6', val
+    knob6 = val
+  when knobs[7]
+    cue 'knob7', val
+    knob7 = val
+  end
+  #Cues are sent per knob to avoid multiple listening loops syncing possibly 100 times in a second
+end  #:midi_cc
+all_lights  #initialise the lights
+sleep 0.1
+#APC_Utility END
+
+
+
+
+with_fx :reverb do
+  with_fx :reverb do
+    live_loop :beeps do
+      tick
+      play 82, sustain: 0, release: 0.3 if states[24] == 1
+      sleep 2
+    end  #:beeps
+  end  #:reverb
+  
+  times_bass = (ring 6,2,8)
+  live_loop :bass do
+    tick
+    use_synth :fm
+    play (ring :eb3,:f3,:g3).look, amp: 0.8, attack: 0.1, sustain: times_bass.look - 1, release: 1 if states[4] == 1
+    sleep times_bass.look
+  end  #:bass
+  
+  live_loop :chords do
+    tick
+    use_synth :hollow
+    use_synth_defaults sustain: times_bass.look - 1, release: (ring 2,2.5,3).choose, attack: (ring 0,0.1,0.2).choose
+    if states[5] == 1
+      play_chord (chord_degree (ring 6,7,1).look, :g3, :minor, (ring 3,4).choose).repeat(2).drop(rand_i(3)).drop_last(rand_i(3))
+      play_chord (chord_degree (ring 6,7,1).look, :g4, :minor, (ring 3,4).choose).repeat(2).drop(rand_i(3)).drop_last(rand_i(3))
+    end
+    sleep times_bass.look
+  end  #:chords
+  
+  live_loop :drums do
+    tick
+    use_sample_defaults amp: 0.7
+    sample :drum_splash_soft if rand() < (ring 0.05,0,0.05,0,0.1,0,0,0.1).look && states[10] == 1
+    sample :drum_cymbal_soft, sustain: 0, release: 0.2 if rand() < (ring 0.5,0.5,0.5,0.5,0.5,0.5,0.5,0.5).look && states[2] == 1
+    sample :drum_snare_soft if rand() < (ring 0.1,0,0.3,0.05,0.7,0.05,0,0.2).look && states[1] == 1
+    sample :drum_bass_soft if rand() < (ring 0.95,0.05,0.05,0.3,0.1,0.2,0.05).look && states[0] == 1
+    sleep 0.25
+  end  #:drums
+end  #:reverb
