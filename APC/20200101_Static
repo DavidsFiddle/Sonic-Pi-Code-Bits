@@ -1,0 +1,120 @@
+#20200101_Static
+#by Davids Fiddle
+
+
+
+#APC Utility BEGIN
+#Globals:
+#use_bpm 80  #BPM for the piece
+use_sample_bpm :guit_em9
+use_sched_ahead_time 0.2  #Balance between playability and stability
+#States of the tracks:
+states = [1,0,0,3,1,0,0,0,
+          0,0,0,3,1,0,0,0,
+          0,0,0,3,1,0,0,0,
+          0,0,0,3,0,0,0,0,
+          0,0,0,0,0,0,0,0
+          ]
+#0 means nothing will happen (disabled)
+#1 means green (active)
+#3 means red (inactive)
+#5 means toggle off (yellow), will switch to 7(also green)
+#7 means toggle off (green), will switch to 5(yellow)
+toggle = (ring 0,3,0,1,0,7,0,5)  #For switching the lights
+knobs = [48,49,50,51,52,53,54,55]  #Adresses for the knobs
+knob0 = 0
+knob1 = 0
+knob2 = 0
+knob3 = 0
+knob4 = 0
+knob5 = 0
+knob6 = 0
+knob7 = 0
+define :all_lights do
+  #Updates all lights
+  for x in (range 0,40)
+    midi_note_on x, states[x]
+  end
+end  #:all_lights
+define :all_off do
+  #Turns all lights off
+  for i in (range 0,87)
+    midi_note_on i,0
+  end
+end  #:all_off
+all_off
+sleep 0.1
+live_loop :midi_control do
+  key,vel = sync "/midi/apc_key_25/0/1/note_on"  #Wait for midi messages
+  if key < 40  #Ignore messages 'out of bounds'
+    states[key] = toggle[states[key]]  #Update the track values
+    midi_note_on key, states[key]  #Update the track lights
+    cue 'event', key
+  end
+end  #:midi_control
+live_loop :midi_cc do
+  key,val = sync "/midi/apc_key_25/0/1/control_change"  #Wait for midi messages
+  case key
+  when knobs[0]
+    cue 'knob0', val
+    knob0 = val
+  when knobs[1]
+    cue 'knob1', val
+    knob1 = val
+  when knobs[2]
+    cue 'knob2', val
+    knob2 = val
+  when knobs[3]
+    cue 'knob3', val
+    knob3 = val
+  when knobs[4]
+    cue 'knob4', val
+    knob4 = val
+  when knobs[5]
+    cue 'knob5', val
+    knob5 = val
+  when knobs[6]
+    cue 'knob6', val
+    knob6 = val
+  when knobs[7]
+    cue 'knob7', val
+    knob7 = val
+  end
+  #Cues are sent per knob to avoid multiple listening loops syncing possibly 100 times in a second
+end  #:midi_cc
+all_lights  #initialise the lights
+sleep 0.1
+#APC_Utility END
+
+
+
+
+s_tape = "F:/Samples/tape deck"
+s_work = "F:/Samples/workshop"
+
+with_fx :reverb, room: 0.8, damp: 0.2 do
+  with_fx :compressor do
+    with_fx :flanger, mix: 0.5 do
+      with_fx :reverb, room: 0.8, damp: 0.4 do
+        live_loop :percussion do
+          tick
+          use_sample_defaults amp: 0.7
+          sample 'ambi', choose, rate: rrand(-1.5,1.5) if one_in(3) && states[27] == 1
+          sample 'perc', choose, rate: rrand(-1.5,1.5) if one_in(2) && states[19] == 1
+          sample s_tape, choose, rate: rrand(-2,2) if one_in(3) && states[3] == 1
+          sample s_work, choose, onset: choose, rate: rrand(-1.5,1.5) if one_in(3) && states[11] == 1
+          sleep 0.25
+        end  #:percussion
+        
+        live_loop :ambi do
+          tick
+          sample :bd_haus, rate: 0.75 if states[0] == 1
+          sample :guit_em9 if states[4] == 1
+          sample :guit_em9, rate: (ring 0.5,-0.5).choose if states[12] == 1
+          sample :guit_e_slide, rate: (ring 1,0.5,0.25,-0.25,-0.5,-1).choose if states[20] == 1
+          sleep 1
+        end  #:ambi
+      end  #:reverb
+    end  #:flanger
+  end  #:compressor
+end  #:reverb
