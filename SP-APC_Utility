@@ -1,10 +1,13 @@
 #APC Utility
 #by Davids Fiddle
-#v1.2
+#v1.3
 
 #APC Utility BEGIN
 #Globals:
 use_sched_ahead_time 0.2  #Balance between playability and stability
+controller_device = 'apc_key_25'  #Port of the controller device. Must be specified to ensure SP sends the light messages only to the controller device and not to other connected midi devices.
+midi_delay = 0.22  #Timing adjustment for MIDI-Synths
+loop_delay = 0.1
 #States of the tracks:
 states = [0,0,0,0,0,0,0,0,
           0,0,0,0,0,0,0,0,
@@ -32,12 +35,14 @@ knob6 = 0
 knob7 = 0
 define :all_lights do
   #Updates all lights
+  use_midi_defaults port: controller_device
   for x in (range 0,num_pads)
     midi_note_on x, states[x]
   end
 end  #:all_lights
 define :all_off do
   #Turns all lights off
+  use_midi_defaults port: controller_device
   for i in (range 0,num_pads)
     midi_note_on i,0
   end
@@ -49,34 +54,34 @@ live_loop :midi_control do
   if key < num_pads  #Ignore messages 'out of bounds'
     states[key] = toggle[states[key]]  #Update the track values
     midi_note_on key, states[key]  #Update the track lights
-    #cue 'event', key  #Disabled for performance, enable if you need it.
+    cue 'event', key  #Disabled for performance, enable if you need it.
   end
 end  #:midi_control
 live_loop :midi_cc do
   key,val = sync "/midi/apc_key_25/0/1/control_change"  #Wait for midi messages
   case key
-  when knobs[0]
+  when knob_adr[0]
     cue 'knob0', val
     knob0 = val
-  when knobs[1]
+  when knob_adr[1]
     cue 'knob1', val
     knob1 = val
-  when knobs[2]
+  when knob_adr[2]
     cue 'knob2', val
     knob2 = val
-  when knobs[3]
+  when knob_adr[3]
     cue 'knob3', val
     knob3 = val
-  when knobs[4]
+  when knob_adr[4]
     cue 'knob4', val
     knob4 = val
-  when knobs[5]
+  when knob_adr[5]
     cue 'knob5', val
     knob5 = val
-  when knobs[6]
+  when knob_adr[6]
     cue 'knob6', val
     knob6 = val
-  when knobs[7]
+  when knob_adr[7]
     cue 'knob7', val
     knob7 = val
   end
