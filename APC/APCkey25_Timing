@@ -1,0 +1,20 @@
+#This code flashes lights on the apc to visualise timing. Specific to the Akai APCkey25 (but you could adapt it to different hardware.)
+live_loop :visual, delay: midi_delay do
+  tick
+  use_midi_defaults channel: 1, port: 'apc_key_25'
+  
+  midi_note_on 64, (ring 1,0,0,0,0,0,0,0).stretch(4).look
+  midi_note_on 65, (ring 0,1,0,0,0,0,0,0).stretch(4).look
+  midi_note_on 66, (ring 0,0,1,0,0,0,0,0).stretch(4).look
+  midi_note_on 67, (ring 0,0,0,1,0,0,0,0).stretch(4).look
+  midi_note_on 68, (ring 0,0,0,0,1,0,0,0).stretch(4).look
+  midi_note_on 69, (ring 0,0,0,0,0,1,0,0).stretch(4).look
+  midi_note_on 70, (ring 0,0,0,0,0,0,1,0).stretch(4).look
+  midi_note_on 71, (ring 0,0,0,0,0,0,0,1).stretch(4).look
+  
+  midi_note_on 82, (ring 1,0,0,0).look
+  midi_note_on 83, (ring 0,1,0,0).look
+  midi_note_on 84, (ring 0,0,1,0).look
+  midi_note_on 85, (ring 0,0,0,1).look
+  sleep 1
+end
