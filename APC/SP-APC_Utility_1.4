@@ -1,0 +1,106 @@
+#APC Utility
+#by Davids Fiddle
+#v1.4
+
+#APC Utility BEGIN
+#Globals:
+use_sched_ahead_time 0.2  #Balance between playability and stability
+midi_delay = 0.1  #Timing adjustment for MIDI-Synths
+loop_delay = 0  #Timing adjustment for SP-live_loops
+#States of the tracks:
+states = [0,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0,
+          0,0,0,1,0,0,0,0,
+          0,0,0,0,0,0,0,0,
+          0,0,0,0,0,0,0,0
+          ]
+#This list represents the pad matrix. If your controller has more pads, you'll have to extend it to use the other pads.
+#0 means nothing will happen (disabled)
+#1 means green (active)
+#3 means red (inactive)
+#5 means toggle off (yellow), will switch to 7(also green)
+#7 means toggle off (green), will switch to 5(yellow)
+toggle = (ring 0,3,0,1,0,7,0,5)  #For switching the lights
+#MIDI-CC:
+knob_adr = [48,49,50,51,52,53,54,55]  #Adresses for the knobs
+knob0 = 0  #Values of the knobs
+knob1 = 0
+knob2 = 0
+knob3 = 0
+knob4 = 0
+knob5 = 0
+knob6 = 0
+knob7 = 0
+#These two functions handle the light pads on the APC. Change the port and channel to work with your device.
+num_pads = 40  #number of pads. Adapt to your device.
+define :all_lights do
+  #Updates all lights
+  use_midi_defaults port: 'apc_key_25', channel: 1
+  for x in (range 0,num_pads)
+    midi_note_on x, states[x]
+  end
+end  #:all_lights
+define :all_off do
+  #Turns all lights off
+  use_midi_defaults port: 'apc_key_25', channel: 1
+  for i in (range 0,num_pads)
+    midi_note_on i,0
+  end
+end  #:all_off
+all_off
+sleep 0.1
+live_loop :midi_control do
+  key,vel = sync "/midi:apc_key_25:0:1/note_on"  #Wait for midi messages
+  if key < num_pads  #Ignore messages 'out of bounds'
+    states[key] = toggle[states[key]]  #Update the track values
+    midi_note_on key, states[key]  #Update the track lights
+    cue 'event', key  #Disabled for performance, enable if you need it.
+  end
+end  #:midi_control
+live_loop :midi_cc do
+  key,val = sync "/midi:apc_key_25:0:1/control_change"  #Wait for midi messages
+  case key
+  when knob_adr[0]
+    cue 'knob0', val
+    knob0 = val
+  when knob_adr[1]
+    cue 'knob1', val
+    knob1 = val
+  when knob_adr[2]
+    cue 'knob2', val
+    knob2 = val
+  when knob_adr[3]
+    cue 'knob3', val
+    knob3 = val
+  when knob_adr[4]
+    cue 'knob4', val
+    knob4 = val
+  when knob_adr[5]
+    cue 'knob5', val
+    knob5 = val
+  when knob_adr[6]
+    cue 'knob6', val
+    knob6 = val
+  when knob_adr[7]
+    cue 'knob7', val
+    knob7 = val
+  end
+  #Cues are sent per knob to avoid multiple listening loops syncing possibly 128 times in a short time
+end  #:midi_cc
+all_lights  #initialise the lights
+use_bpm 60  #BPM for the piece
+sleep 0.1
+#APC_Utility END
+
+
+#Example for an 'internal' loop:
+live_loop :loop_example, delay: rt(loop_delay) do
+  #Do stuff
+  sleep 1
+end
+#Example for a MIDI loop:
+live_loop :midi_example, delay: rt(midi_delay) do
+  #Do stuff
+  sleep 1
+end
+#rt(delay) so the delay is independant from the BPM
