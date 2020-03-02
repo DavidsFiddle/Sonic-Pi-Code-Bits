@@ -1,0 +1,42 @@
+#20200302_Session
+#Coded by Davids Fiddle
+use_bpm 130
+use_random_seed 789
+
+
+with_fx :echo, mix: 0.2, phase: 0.5, decay: 4 do
+  with_fx :slicer, amp_min: 0, probability: 0.53, prob_pos: 0.1, mix: 0.5 do
+    with_fx :compressor, pre_amp: 3, relax_time: 0.1 do
+      live_loop :drums do
+        tick
+        sample :bd_haus, amp: 0.9 if (bools 1,0,0,0).look
+        sample :bd_gas, amp: 0.7 if (bools 0,1,0,1,1).look || one_in(4)
+        sample :elec_mid_snare, amp: 1 if (bools 0,0,0,0,1,0,0,0).look
+        sample 'elec','tw', choose, amp: 0.5, rate: (ring 0.5,1,1).choose if (bools 1,0,1,1,1,1,1,0).look
+        sleep 0.25
+      end  #:drums
+      
+      percs = (sample_names :perc).pick(8)
+      live_loop :ambi do
+        tick
+        with_fx :ping_pong, phase: rrand(1,2), mix: 0.5, feedback: rrand(0.3,0.9) do
+          sample 'perc', percs.look
+        end
+        use_synth :hollow
+        play :f1 + (ring 0,0,12,12,24).choose, sustain: 3, release: 1, attack: 0.5
+        sleep 4
+      end  #:ambi
+      
+      bass_riff = (scale :f3, :phrygian, num_octaves: 2).pick(16)
+      live_loop :bass do
+        tick
+        use_synth :tb303
+        use_synth_defaults amp: rrand(0.4,0.6),
+          res: (line 0.6,0.8, steps: 24).mirror.look
+        play bass_riff.look - 12, cutoff: bass_riff.look + 12
+        play bass_riff.look, cutoff: bass_riff.look + 24
+        sleep 0.5
+      end
+    end  #:compressor
+  end  #:slicer
+end  #:echo
