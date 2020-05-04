@@ -87,7 +87,7 @@ with_fx :reverb, room: 0.6 do
   live_loop :plucks1, delay: 32 do
     stop if fin
     tick
-    use_merged_synth_defaults amp: fadeIn2.look * (line 0.6,0.8).choose,
+    use_synth_defaults amp: fadeIn2.look * (line 0.6,0.8).choose,
       coef: (line 0.1,0.3,steps: 24).mirror.look
     4.times do
       if(padSection)
